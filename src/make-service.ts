@@ -104,12 +104,12 @@ async function enhancedFetch(input: string | URL, options?: Options) {
  * @param baseHeaders any headers that should be sent with every request
  * @returns an API object with HTTP methods that are functions that receive a path and options and return a serialized json response that can be typed or not.
  * @example const headers = { Authorization: "Bearer 123" }
- * const api = makeApi("https://example.com/api", headers);
+ * const api = makeService("https://example.com/api", headers);
  * const response = await api.get("/users")
  * const users = await response.json(userSchema);
  * //    ^? User[]
  */
-function makeApi(baseURL: string, baseHeaders?: HeadersInit) {
+function makeService(baseURL: string, baseHeaders?: HeadersInit) {
   /**
    * A function that receives a path and options and returns a serialized json response that can be typed or not.
    * @param method the HTTP method
@@ -141,7 +141,7 @@ export {
   addQueryToInput,
   ensureStringBody,
   enhancedFetch,
-  makeApi,
+  makeService,
   makeGetApiUrl,
   typedResponse,
 }

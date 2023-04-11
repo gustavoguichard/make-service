@@ -2,7 +2,7 @@ export {
   addQueryToInput,
   ensureStringBody,
   enhancedFetch,
-  makeApi,
+  makeService,
   makeGetApiUrl,
   typedResponse,
-} from './make-api.ts'
+} from './make-service.ts'

@@ -275,9 +275,9 @@ describe('enhancedFetch', () => {
   })
 })
 
-describe('makeApi', () => {
+describe('makeService', () => {
   it('should return an object with http methods', () => {
-    const api = subject.makeApi('https://example.com/api')
+    const api = subject.makeService('https://example.com/api')
     for (const method of HTTP_METHODS) {
       assertEquals(typeof api[method], 'function')
     }
@@ -285,7 +285,7 @@ describe('makeApi', () => {
 
   it('should return an API with enhancedFetch', async () => {
     const fetchStub = stub(window, 'fetch', successfulFetch({ foo: 'bar' }))
-    const api = subject.makeApi('https://example.com/api')
+    const api = subject.makeService('https://example.com/api')
     const result = await api
       .post('/users')
       .then((r) => r.json(z.object({ foo: z.string() })))
@@ -303,7 +303,7 @@ describe('makeApi', () => {
 
   it('should add headers and method to the request', async () => {
     const fetchStub = stub(window, 'fetch', successfulFetch({ foo: 'bar' }))
-    const api = subject.makeApi('https://example.com/api', {
+    const api = subject.makeService('https://example.com/api', {
       Authorization: 'Bearer 123',
     })
     await api.get('/users')
@@ -321,7 +321,7 @@ describe('makeApi', () => {
   it('should accept a query, trace, and JSON-like body', async () => {
     const trace = spy()
     const fetchStub = stub(window, 'fetch', successfulFetch({ foo: 'bar' }))
-    const api = subject.makeApi('https://example.com/api')
+    const api = subject.makeService('https://example.com/api')
     await api.post('/users', {
       body: { id: 1, name: { first: 'John', last: 'Doe' } },
       query: { admin: 'true' },

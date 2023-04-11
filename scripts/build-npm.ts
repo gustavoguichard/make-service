@@ -12,16 +12,16 @@ await build({
   outDir: './npm',
   shims: { deno: true, undici: true },
   package: {
-    name: 'api-constructors',
+    name: 'make-service',
     version: pkg.version,
     description:
-      'Some utilities to extend the "fetch" API adding some utilities to better interact with external APIs.',
+      'Some utilities to extend the "fetch" API to better interact with external APIs.',
     license: 'MIT',
     author: 'Gustavo Guichard',
     bugs: {
-      url: 'https://github.com/gustavoguichard/make-api/issues',
+      url: 'https://github.com/gustavoguichard/make-service/issues',
     },
-    homepage: 'https://github.com/gustavoguichard/make-api',
+    homepage: 'https://github.com/gustavoguichard/make-service',
   },
 })
 
