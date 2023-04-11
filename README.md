@@ -34,134 +34,15 @@ Or you can use it with Deno:
 import { makeService } from "https://deno.land/x/make_service/mod.ts";
 ```
 
-# Public API
+# API
 
-This library exports the `makeService` function and all primitives used to build it. You can use the primitives as you wish but the `makeService` will have all the features combined.
-
-## addQueryToInput
-
-Adds an object of query parameters to a string or URL.
-
-```ts
-import { addQueryToInput } from 'make-service'
-
-const input = addQueryToInput("https://example.com", { page: "1" })
-// input = "https://example.com?page=1"
-
-const input = addQueryToInput("https://example.com?page=1", { admin: "true" })
-// input = "https://example.com?page=1&admin=true"
-
-const input = addQueryToInput(new URL("https://example.com"), { page: "1" })
-// input.toString() = "https://example.com?page=1"
-```
-
-## makeGetApiUrl
-
-Creates a function that will add an endpoint and a query to the base URL.
-It uses the `addQueryToInput` function internally.
-
-```ts
-import { makeGetApiUrl } from 'make-service'
-
-const getApiUrl = makeGetApiUrl("https://example.com/api")
-
-const url = getApiUrl("/users", { page: "1" })
-// url = "https://example.com/api/users?page=1"
-```
-
-## ensureStringBody
-
-Ensures that the body is a string. If it's not, it will be stringified.
-
-```ts
-import { ensureStringBody } from 'make-service'
-
-const body1 = ensureStringBody({ foo: "bar" })
-// body1 = '{"foo":"bar"}'
-await fetch("https://example.com/api/users", {
-  method: 'POST',
-  body: body1
-})
-
-const body2 = ensureStringBody('{"foo":"bar"}')
-// body2 = '{"foo":"bar"}'
-await fetch("https://example.com/api/users", {
-  method: 'POST',
-  body: body2
-})
-```
-
-## typedResponse
-
-A type-safe wrapper around the `Response` object. It adds a `json` and `text` method that will parse the response with a given zod schema. If you don't provide a schema, it will return `unknown` instead of `any`, then you can also give it a generic to type cast the result.
-
-```ts
-import { typedResponse } from 'make-service'
-
-// With JSON
-const response = new Response(JSON.stringify({ foo: "bar" }))
-const json = await typedResponse(response).json()
-//    ^? unknown
-const json = await typedResponse(response).json<{ foo: string }>()
-//    ^? { foo: string }
-const json = await typedResponse(response).json(z.object({ foo: z.string() }))
-//    ^? { foo: string }
-
-// With text
-const response = new Response("foo")
-const text = await typedResponse(response).text()
-//    ^? string
-const text = await typedResponse(response).text<`foo${string}`>()
-//    ^? `foo${string}`
-const text = await typedResponse(response).text(z.string().email())
-//    ^? string
-```
-
-## enhancedFetch
-
-A wrapper around the `fetch` API.
-It uses the `addQueryToInput`, `ensureStringBody` function internally and returns a `typedResponse` instead of a `Response`.
-
-```ts
-import { enhancedFetch } from 'make-service'
-
-const response = await enhancedFetch("https://example.com/api/users", {
-  method: 'POST',
-  body: { some: { object: { as: { body } } } }
-})
-const json = await response.json()
-//    ^? unknown
-// You can pass it a generic or schema to type the result
-```
-
-This function accepts the same arguments as the `fetch` API - with exception of JSON-like body -, and it also accepts an object-like `query` and a `trace` function that will be called with the `input` and `requestInit` arguments.
-
-```ts
-import { enhancedFetch } from 'make-service'
-
-await enhancedFetch("https://example.com/api/users", {
-  method: 'POST',
-  body: { some: { object: { as: { body } } } },
-  query: { page: "1" },
-  trace: (input, requestInit) => console.log(input, requestInit)
-})
-
-// The trace function will be called with the following arguments:
-// "https://example.com/api/users?page=1"
-// {
-//   method: 'POST',
-//   body: '{"some":{"object":{"as":{"body":{}}}}}',
-//   headers: { 'content-type': 'application/json' }
-// }
-```
-
-Notice: the `enhancedFetch` adds a `'content-type': 'application/json'` header by default.
+This library exports the `makeService` function and some primitives used to build it. You can use the primitives as you wish but the `makeService` will have all the features combined.
 
 # makeService
 
-The main function of this lib is built on top of the previous primitives and it allows you to create an "API" object with a `baseURL` and common `headers` for every request.
+The main function of this lib is built on top of the primitives described in the following sections. It allows you to create an "API" object with a `baseURL` and common `headers` for every request.
 
-This "api" object can be called with every HTTP method and it will return a `typedResponse` object as it uses the `enhancedFetch` internally.
+This "api" object can be called with every HTTP method and it will return a [`typedResponse`](#typedresponse) object as it uses the [`enhancedFetch`](#enhancedfetch) internally.
 
 ```ts
 import { makeService } from 'make-service'
@@ -175,7 +56,7 @@ const json = await response.json()
 //    ^? unknown
 ```
 
-On the example above, the `api.get` will call the `enhancedFetch` with the following arguments:
+On the example above, the `api.get` will call the [`enhancedFetch`](#enhancedfetch) with the following arguments:
 
 ```ts
 // "https://example.com/api/users"
@@ -188,9 +69,9 @@ On the example above, the `api.get` will call the `enhancedFetch` with the follo
 // }
 ```
 
-The `api` object can be called with the same arguments as the `enhancedFetch`, such as `query`, object-like `body`, and `trace`.
+The `api` object can be called with the same arguments as the [`enhancedFetch`](#enhancedfetch), such as [`query`](#addquerytoinput), object-like [`body`](#ensurestringbody), and `trace`.
 
-Its `typedResponse` can also be parsed with a zod schema. Here follows a little more complex example:
+Its [`typedResponse`](#typedresponse) can also be parsed with a zod schema. Here follows a little more complex example:
 
 ```ts
 const response = await api.get("/users", {
@@ -221,6 +102,125 @@ await api.patch("/users/1", { body: { name: "John" } })
 await api.delete("/users/1")
 await api.head("/users")
 await api.options("/users")
+```
+
+## enhancedFetch
+
+A wrapper around the `fetch` API.
+It uses the [`addQueryToInput`](#addquerytoinput), [`ensureStringBody`](#ensurestringbody) function internally and returns a [`typedResponse`](#typedresponse) instead of a `Response`.
+
+```ts
+import { enhancedFetch } from 'make-service'
+
+const response = await enhancedFetch("https://example.com/api/users", {
+  method: 'POST',
+  body: { some: { object: { as: { body } } } }
+})
+const json = await response.json()
+//    ^? unknown
+// You can pass it a generic or schema to type the result
+```
+
+This function accepts the same arguments as the `fetch` API - with exception of JSON-like body -, and it also accepts an object-like [`query`](#addquerytoinput) and a `trace` function that will be called with the `input` and `requestInit` arguments.
+
+```ts
+import { enhancedFetch } from 'make-service'
+
+await enhancedFetch("https://example.com/api/users", {
+  method: 'POST',
+  body: { some: { object: { as: { body } } } },
+  query: { page: "1" },
+  trace: (input, requestInit) => console.log(input, requestInit)
+})
+
+// The trace function will be called with the following arguments:
+// "https://example.com/api/users?page=1"
+// {
+//   method: 'POST',
+//   body: '{"some":{"object":{"as":{"body":{}}}}}',
+//   headers: { 'content-type': 'application/json' }
+// }
+```
+
+Notice: the `enhancedFetch` adds a `'content-type': 'application/json'` header by default.
+
+## typedResponse
+
+A type-safe wrapper around the `Response` object. It adds a `json` and `text` method that will parse the response with a given zod schema. If you don't provide a schema, it will return `unknown` instead of `any`, then you can also give it a generic to type cast the result.
+
+```ts
+import { typedResponse } from 'make-service'
+
+// With JSON
+const response = new Response(JSON.stringify({ foo: "bar" }))
+const json = await typedResponse(response).json()
+//    ^? unknown
+const json = await typedResponse(response).json<{ foo: string }>()
+//    ^? { foo: string }
+const json = await typedResponse(response).json(z.object({ foo: z.string() }))
+//    ^? { foo: string }
+
+// With text
+const response = new Response("foo")
+const text = await typedResponse(response).text()
+//    ^? string
+const text = await typedResponse(response).text<`foo${string}`>()
+//    ^? `foo${string}`
+const text = await typedResponse(response).text(z.string().email())
+//    ^? string
+```
+
+## makeGetApiUrl
+
+Creates a function that will add an endpoint and a query to the base URL.
+It uses the [`addQueryToInput`](#addquerytoinput) function internally.
+
+```ts
+import { makeGetApiUrl } from 'make-service'
+
+const getApiUrl = makeGetApiUrl("https://example.com/api")
+
+const url = getApiUrl("/users", { page: "1" })
+// url = "https://example.com/api/users?page=1"
+```
+
+## addQueryToInput
+
+Adds an object of query parameters to a string or URL.
+
+```ts
+import { addQueryToInput } from 'make-service'
+
+const input = addQueryToInput("https://example.com", { page: "1" })
+// input = "https://example.com?page=1"
+
+const input = addQueryToInput("https://example.com?page=1", { admin: "true" })
+// input = "https://example.com?page=1&admin=true"
+
+const input = addQueryToInput(new URL("https://example.com"), { page: "1" })
+// input.toString() = "https://example.com?page=1"
+```
+
+## ensureStringBody
+
+Ensures that the body is a string. If it's not, it will be stringified.
+
+```ts
+import { ensureStringBody } from 'make-service'
+
+const body1 = ensureStringBody({ foo: "bar" })
+// body1 = '{"foo":"bar"}'
+await fetch("https://example.com/api/users", {
+  method: 'POST',
+  body: body1
+})
+
+const body2 = ensureStringBody('{"foo":"bar"}')
+// body2 = '{"foo":"bar"}'
+await fetch("https://example.com/api/users", {
+  method: 'POST',
+  body: body2
+})
 ```
 
 ## Thank you
