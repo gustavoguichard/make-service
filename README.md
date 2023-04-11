@@ -195,7 +195,7 @@ Its `typedResponse` can also be parsed with a zod schema. Here follows a little 
 ```ts
 const response = await api.get("/users", {
   query: { search: "John" },
-  trace: (...args: any[]) => console.log(...args)
+  trace: (input, requestInit) => console.log(input, requestInit),
 })
 const json = await response.json(
   z.object({
