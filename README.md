@@ -1,4 +1,4 @@
-# make-api
+# api-constructors
 
 A type-safe thin wrapper around the `fetch` API to better interact with external APIs.
 
@@ -26,12 +26,12 @@ const users = await response.json(usersSchema);
 ## Installation
 
 ```sh
-npm install make-api
+npm install api-constructors
 ```
 Or you can use it with Deno:
 
 ```ts
-import { makeApi } from "https://deno.land/x/make_api/mod.ts";
+import { makeApi } from "https://deno.land/x/api_constructors/mod.ts";
 ```
 
 # Public API
@@ -43,7 +43,7 @@ This library exports the `makeApi` function and all primitives used to build it.
 Adds an object of query parameters to a string or URL.
 
 ```ts
-import { addQueryToInput } from 'make-api'
+import { addQueryToInput } from 'api-constructors'
 
 const input = addQueryToInput("https://example.com", { page: "1" })
 // input = "https://example.com?page=1"
@@ -61,7 +61,7 @@ Creates a function that will add an endpoint and a query to the base URL.
 It uses the `addQueryToInput` function internally.
 
 ```ts
-import { makeGetApiUrl } from 'make-api'
+import { makeGetApiUrl } from 'api-constructors'
 
 const getApiUrl = makeGetApiUrl("https://example.com/api")
 
@@ -74,7 +74,7 @@ const url = getApiUrl("/users", { page: "1" })
 Ensures that the body is a string. If it's not, it will be stringified.
 
 ```ts
-import { ensureStringBody } from 'make-api'
+import { ensureStringBody } from 'api-constructors'
 
 const body1 = ensureStringBody({ foo: "bar" })
 // body1 = '{"foo":"bar"}'
@@ -96,7 +96,7 @@ await fetch("https://example.com/api/users", {
 A type-safe wrapper around the `Response` object. It adds a `json` and `text` method that will parse the response with a given zod schema. If you don't provide a schema, it will return `unknown` instead of `any`, then you can also give it a generic to type cast the result.
 
 ```ts
-import { typedResponse } from 'make-api'
+import { typedResponse } from 'api-constructors'
 
 // With JSON
 const response = new Response(JSON.stringify({ foo: "bar" }))
@@ -123,7 +123,7 @@ A wrapper around the `fetch` API.
 It uses the `addQueryToInput`, `ensureStringBody` function internally and returns a `typedResponse` instead of a `Response`.
 
 ```ts
-import { enhancedFetch } from 'make-api'
+import { enhancedFetch } from 'api-constructors'
 
 const response = await enhancedFetch("https://example.com/api/users", {
   method: 'POST',
@@ -137,7 +137,7 @@ const json = await response.json()
 This function accepts the same arguments as the `fetch` API - with exception of JSON-like body -, and it also accepts an object-like `query` and a `trace` function that will be called with the `input` and `requestInit` arguments.
 
 ```ts
-import { enhancedFetch } from 'make-api'
+import { enhancedFetch } from 'api-constructors'
 
 await enhancedFetch("https://example.com/api/users", {
   method: 'POST',
@@ -164,7 +164,7 @@ The main function of this lib is built on top of the previous primitives and it 
 This "api" object can be called with every HTTP method and it will return a `typedResponse` object as it uses the `enhancedFetch` internally.
 
 ```ts
-import { makeApi } from 'make-api'
+import { makeApi } from 'api-constructors'
 
 const api = makeApi("https://example.com/api", {
   authorization: "Bearer 123"

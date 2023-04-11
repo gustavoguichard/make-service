@@ -6,12 +6,13 @@ await emptyDir('./npm')
 await build({
   scriptModule: 'cjs',
   typeCheck: false,
+  test: false,
   declaration: true,
   entryPoints: ['./src/index.ts'],
   outDir: './npm',
-  shims: { deno: true },
+  shims: { deno: true, undici: true },
   package: {
-    name: 'make-api',
+    name: 'api-constructors',
     version: pkg.version,
     description:
       'Some utilities to extend the "fetch" API adding some utilities to better interact with external APIs.',
