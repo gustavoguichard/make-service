@@ -69,7 +69,7 @@ On the example above, the `api.get` will call the [`enhancedFetch`](#enhancedfet
 // }
 ```
 
-The `api` object can be called with the same arguments as the [`enhancedFetch`](#enhancedfetch), such as [`query`](#addquerytoinput), object-like [`body`](#ensurestringbody), and `trace`.
+The `api` object can be called with the same arguments as the [`enhancedFetch`](#enhancedfetch), such as `query`, object-like `body`, and `trace`.
 
 Its [`typedResponse`](#typedresponse) can also be parsed with a zod schema. Here follows a little more complex example:
 
@@ -107,7 +107,7 @@ await api.options("/users")
 ## enhancedFetch
 
 A wrapper around the `fetch` API.
-It uses the [`addQueryToInput`](#addquerytoinput), [`ensureStringBody`](#ensurestringbody) function internally and returns a [`typedResponse`](#typedresponse) instead of a `Response`.
+It returns a [`typedResponse`](#typedresponse) instead of a `Response`.
 
 ```ts
 import { enhancedFetch } from 'make-service'
@@ -121,7 +121,7 @@ const json = await response.json()
 // You can pass it a generic or schema to type the result
 ```
 
-This function accepts the same arguments as the `fetch` API - with exception of JSON-like body -, and it also accepts an object-like [`query`](#addquerytoinput) and a `trace` function that will be called with the `input` and `requestInit` arguments.
+This function accepts the same arguments as the `fetch` API - with exception of [JSON-like body](/src/make-service.ts) -, and it also accepts an object-like [`query`](/src/make-service.ts) and a `trace` function that will be called with the `input` and `requestInit` arguments.
 
 ```ts
 import { enhancedFetch } from 'make-service'
@@ -168,59 +168,6 @@ const text = await typedResponse(response).text<`foo${string}`>()
 //    ^? `foo${string}`
 const text = await typedResponse(response).text(z.string().email())
 //    ^? string
-```
-
-## makeGetApiUrl
-
-Creates a function that will add an endpoint and a query to the base URL.
-It uses the [`addQueryToInput`](#addquerytoinput) function internally.
-
-```ts
-import { makeGetApiUrl } from 'make-service'
-
-const getApiUrl = makeGetApiUrl("https://example.com/api")
-
-const url = getApiUrl("/users", { page: "1" })
-// url = "https://example.com/api/users?page=1"
-```
-
-## addQueryToInput
-
-Adds an object of query parameters to a string or URL.
-
-```ts
-import { addQueryToInput } from 'make-service'
-
-const input = addQueryToInput("https://example.com", { page: "1" })
-// input = "https://example.com?page=1"
-
-const input = addQueryToInput("https://example.com?page=1", { admin: "true" })
-// input = "https://example.com?page=1&admin=true"
-
-const input = addQueryToInput(new URL("https://example.com"), { page: "1" })
-// input.toString() = "https://example.com?page=1"
-```
-
-## ensureStringBody
-
-Ensures that the body is a string. If it's not, it will be stringified.
-
-```ts
-import { ensureStringBody } from 'make-service'
-
-const body1 = ensureStringBody({ foo: "bar" })
-// body1 = '{"foo":"bar"}'
-await fetch("https://example.com/api/users", {
-  method: 'POST',
-  body: body1
-})
-
-const body2 = ensureStringBody('{"foo":"bar"}')
-// body2 = '{"foo":"bar"}'
-await fetch("https://example.com/api/users", {
-  method: 'POST',
-  body: body2
-})
 ```
 
 ## Thank you
