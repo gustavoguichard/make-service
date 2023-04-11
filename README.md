@@ -205,7 +205,7 @@ const json = await response.json(
       }))
     })
   })
-  // transformed and catched
+  // transformed and caught
   .transform(({ data: { users } }) => users)
   .catch([])
 )
