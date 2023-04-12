@@ -6,3 +6,4 @@ export {
   makeGetApiUrl,
   typedResponse,
 } from './make-service'
+export type * from './types'
