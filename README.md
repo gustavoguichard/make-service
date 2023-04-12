@@ -155,21 +155,21 @@ import { typedResponse } from 'make-service'
 import type { TypedResponse } from 'make-service'
 
 // With JSON
-const response: TypedResponse = new Response(JSON.stringify({ foo: "bar" }))
-const json = await typedResponse(response).json()
+const response: TypedResponse = typedResponse(new Response(JSON.stringify({ foo: "bar" })))
+const json = await response.json()
 //    ^? unknown
-const json = await typedResponse(response).json<{ foo: string }>()
+const json = await response.json<{ foo: string }>()
 //    ^? { foo: string }
-const json = await typedResponse(response).json(z.object({ foo: z.string() }))
+const json = await response.json(z.object({ foo: z.string() }))
 //    ^? { foo: string }
 
 // With text
-const response: TypedResponse = new Response("foo")
-const text = await typedResponse(response).text()
+const response: TypedResponse = typedResponse(new Response("foo"))
+const text = await response.text()
 //    ^? string
-const text = await typedResponse(response).text<`foo${string}`>()
+const text = await response.text<`foo${string}`>()
 //    ^? `foo${string}`
-const text = await typedResponse(response).text(z.string().email())
+const text = await response.text(z.string().email())
 //    ^? string
 ```
 
