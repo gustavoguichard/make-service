@@ -40,9 +40,9 @@ This library exports the `makeService` function and some primitives used to buil
 
 # makeService
 
-The main function of this lib is built on top of the primitives described in the following sections. It allows you to create an "API" object with a `baseURL` and common `headers` for every request.
+The main function of this lib is built on top of the primitives described in the following sections. It allows you to create a service object with a `baseURL` and common `headers` for every request.
 
-This "api" object can be called with every HTTP method and it will return a [`typedResponse`](#typedresponse) object as it uses the [`enhancedFetch`](#enhancedfetch) internally.
+This service object can be called with every HTTP method and it will return a [`typedResponse`](#typedresponse) object as it uses the [`enhancedFetch`](#enhancedfetch) internally.
 
 ```ts
 import { makeService } from 'make-service'
@@ -107,7 +107,7 @@ await api.options("/users")
 ## enhancedFetch
 
 A wrapper around the `fetch` API.
-It returns a [`typedResponse`](#typedresponse) instead of a `Response`.
+It returns a [`TypedResponse`](#typedresponse) instead of a `Response`.
 
 ```ts
 import { enhancedFetch } from 'make-service'
@@ -122,6 +122,8 @@ const json = await response.json()
 ```
 
 This function accepts the same arguments as the `fetch` API - with exception of [JSON-like body](/src/make-service.ts) -, and it also accepts an object-like [`query`](/src/make-service.ts) and a `trace` function that will be called with the `input` and `requestInit` arguments.
+
+This slightly different `RequestInit` is typed as `EnhancedRequestInit`.
 
 ```ts
 import { enhancedFetch } from 'make-service'
@@ -150,9 +152,10 @@ A type-safe wrapper around the `Response` object. It adds a `json` and `text` me
 
 ```ts
 import { typedResponse } from 'make-service'
+import type { TypedResponse } from 'make-service'
 
 // With JSON
-const response = new Response(JSON.stringify({ foo: "bar" }))
+const response: TypedResponse = new Response(JSON.stringify({ foo: "bar" }))
 const json = await typedResponse(response).json()
 //    ^? unknown
 const json = await typedResponse(response).json<{ foo: string }>()
@@ -161,7 +164,7 @@ const json = await typedResponse(response).json(z.object({ foo: z.string() }))
 //    ^? { foo: string }
 
 // With text
-const response = new Response("foo")
+const response: TypedResponse = new Response("foo")
 const text = await typedResponse(response).text()
 //    ^? string
 const text = await typedResponse(response).text<`foo${string}`>()
