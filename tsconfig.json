@@ -1,0 +1,17 @@
+{
+  "include": [
+    "src/**/*.ts",
+    "src/**/*.tsx"
+  ],
+  "compilerOptions": {
+    "declaration": true,
+    "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true,
+    "module": "commonjs",
+    "outDir": "./tsc/",
+    "skipLibCheck": true,
+    "strict": true,
+    "target": "es2019",
+    "types": ["vitest/globals"]
+  }
+}

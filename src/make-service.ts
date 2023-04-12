@@ -1,5 +1,5 @@
-import { getJson, getText, isHTTPMethod } from './internals.ts'
-import { HTTPMethod, JSONValue, SearchParams } from './types.ts'
+import { getJson, getText, isHTTPMethod } from './internals'
+import { HTTPMethod, JSONValue, SearchParams } from './types'
 
 /**
  * @param input a string or URL to which the query parameters will be added

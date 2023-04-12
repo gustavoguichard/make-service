@@ -5,4 +5,4 @@ export {
   makeService,
   makeGetApiUrl,
   typedResponse,
-} from './make-service.ts'
+} from './make-service'

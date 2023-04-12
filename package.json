@@ -1,0 +1,37 @@
+{
+  "name": "make-service",
+  "version": "0.0.2",
+  "description": "Some utilities to extend the 'fetch' API to better interact with external APIs.",
+  "main": "./dist/index.js",
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.ts",
+  "author": "Gustavo Guichard <@gugaguichard>",
+  "license": "MIT",
+  "scripts": {
+    "build": "tsup ./src/index.ts --format esm,cjs --dts",
+    "dev": "tsup ./src/index.ts --format esm,cjs --watch --dts",
+    "lint": "eslint *.ts*",
+    "tsc": "tsc",
+    "test": "vitest run"
+  },
+  "devDependencies": {
+    "eslint": "latest",
+    "jsdom": "^21.1.1",
+    "prettier": "latest",
+    "tsup": "^6.7.0",
+    "typescript": "^5.0.4",
+    "vitest": "latest",
+    "zod": "latest"
+  },
+  "files": [
+    "README.md",
+    "./dist/*"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/gugaguichard/make-service.git"
+  },
+  "bugs": {
+    "url": "https://github.com/gugaguichard/make-service/issues"
+  }
+}

@@ -1,4 +1,4 @@
-import { HTTP_METHODS } from './constants.ts'
+import { HTTP_METHODS } from './constants'
 
 type Schema<T> = { parse: (d: unknown) => T }
 
@@ -11,6 +11,6 @@ type JSONValue =
 
 type SearchParams = ConstructorParameters<typeof URLSearchParams>[0]
 
-type HTTPMethod = typeof HTTP_METHODS[number]
+type HTTPMethod = (typeof HTTP_METHODS)[number]
 
 export type { HTTPMethod, JSONValue, Schema, SearchParams }

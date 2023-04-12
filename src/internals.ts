@@ -1,5 +1,5 @@
-import { HTTP_METHODS } from './constants.ts'
-import { HTTPMethod, Schema } from './types.ts'
+import { HTTP_METHODS } from './constants'
+import { HTTPMethod, Schema } from './types'
 
 /**
  * It returns the JSON object or throws an error if the response is not ok.
