@@ -67,6 +67,12 @@ describe('addQueryToInput', () => {
     expect(
       subject.addQueryToInput('https://example.com/api?id=1', 'page=2'),
     ).toBe('https://example.com/api?id=1&page=2')
+    expect(
+      subject.addQueryToInput(
+        'https://example.com/api?id=1',
+        new URLSearchParams({ page: '2' }),
+      ),
+    ).toBe('https://example.com/api?id=1&page=2')
   })
 
   it('should append the query to a URL instance that already has QS', () => {
@@ -79,6 +85,12 @@ describe('addQueryToInput', () => {
       subject.addQueryToInput(
         new URL('https://example.com/api?id=1'),
         'page=2',
+      ),
+    ).toEqual(new URL('https://example.com/api?id=1&page=2'))
+    expect(
+      subject.addQueryToInput(
+        new URL('https://example.com/api?id=1'),
+        new URLSearchParams({ page: '2' }),
       ),
     ).toEqual(new URL('https://example.com/api?id=1&page=2'))
   })
