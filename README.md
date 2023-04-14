@@ -104,6 +104,38 @@ await api.head("/users")
 await api.options("/users")
 ```
 
+This function can also correctly merge any sort of `URL`, `URLSearchParams`, and `Headers`.
+
+```ts
+import { makeService } from 'make-service'
+
+const api = makeService(new URL("https://example.com/api"), new Headers({
+  authorization: "Bearer 123"
+}))
+
+const response = await api.get("/users?admin=true", {
+  headers: [['accept', 'application/json']],
+  query: { page: "2" },
+})
+
+// It will call "https://example.com/api/users?admin=true&page=2"
+// with headers: { authorization: "Bearer 123", accept: "application/json" }
+```
+
+In case you want to delete a header previously set you can pass `undefined` or `'undefined'` as its value:
+```ts
+const api = makeService("https://example.com/api", { authorization: "Bearer 123" })
+const response = await api.get("/users", {
+  headers: new Headers({ authorization: 'undefined', "Content-Type": undefined }),
+})
+// headers will be empty.
+```
+Note: Don't forget headers are case insensitive.
+```ts
+const headers = new Headers({ 'Content-Type': 'application/json' })
+Object.fromEntries(headers) // equals to: { 'content-type': 'application/json' }
+```
+
 ## enhancedFetch
 
 A wrapper around the `fetch` API.
