@@ -69,6 +69,20 @@ describe('addQueryToInput', () => {
     ).toBe('https://example.com/api?id=1&page=2')
   })
 
+  it('should append the query to a URL instance that already has QS', () => {
+    expect(
+      subject.addQueryToInput(new URL('https://example.com/api?id=1'), {
+        page: '2',
+      }),
+    ).toEqual(new URL('https://example.com/api?id=1&page=2'))
+    expect(
+      subject.addQueryToInput(
+        new URL('https://example.com/api?id=1'),
+        'page=2',
+      ),
+    ).toEqual(new URL('https://example.com/api?id=1&page=2'))
+  })
+
   it("should return the input in case there's no query", () => {
     expect(subject.addQueryToInput('https://example.com/api')).toBe(
       'https://example.com/api',
@@ -94,6 +108,18 @@ describe('makeGetApiUrl', () => {
     expect(getApiURL('/users', { active: 'true', page: '2' })).toBe(
       'https://example.com/api/users?active=true&page=2',
     )
+  })
+
+  it('should accept a URL as baseURL and remove extra slashes', () => {
+    expect(
+      subject.makeGetApiUrl(new URL('https://example.com/api'))('/users'),
+    ).toBe('https://example.com/api/users')
+    expect(
+      subject.makeGetApiUrl(new URL('https://example.com/api/'))('/users'),
+    ).toBe('https://example.com/api/users')
+    expect(
+      subject.makeGetApiUrl(new URL('https://example.com/api/'))('///users'),
+    ).toBe('https://example.com/api/users')
   })
 })
 

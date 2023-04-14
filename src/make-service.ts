@@ -48,12 +48,16 @@ function addQueryToInput(
 ): string | URL {
   if (!searchParams) return input
 
-  if (searchParams && typeof input === 'string') {
+  if (typeof input === 'string') {
     const separator = input.includes('?') ? '&' : '?'
     return `${input}${separator}${new URLSearchParams(searchParams)}`
   }
   if (searchParams && input instanceof URL) {
-    input.search = new URLSearchParams(searchParams).toString()
+    for (const [key, value] of Object.entries(
+      new URLSearchParams(searchParams),
+    )) {
+      input.searchParams.set(key, value)
+    }
   }
   return input
 }
@@ -62,9 +66,12 @@ function addQueryToInput(
  * @param baseURL the base path to the API
  * @returns a function that receives a path and an object of query parameters and returns a URL
  */
-function makeGetApiUrl(baseURL: string) {
-  return (path: string, searchParams?: SearchParams): string | URL =>
-    addQueryToInput(`${baseURL}${path}`, searchParams)
+function makeGetApiUrl(baseURL: string | URL) {
+  const base = baseURL instanceof URL ? baseURL.toString() : baseURL
+  return (path: string, searchParams?: SearchParams): string | URL => {
+    const url = `${base}${path}`.replace(/([^https?:]\/)\/+/g, '$1')
+    return addQueryToInput(url, searchParams)
+  }
 }
 
 /**
@@ -150,7 +157,7 @@ async function enhancedFetch(
  * const users = await response.json(userSchema);
  * //    ^? User[]
  */
-function makeService(baseURL: string, baseHeaders?: HeadersInit) {
+function makeService(baseURL: string | URL, baseHeaders?: HeadersInit) {
   /**
    * A function that receives a path and requestInit and returns a serialized json response that can be typed or not.
    * @param method the HTTP method
