@@ -13,6 +13,32 @@ beforeEach(() => {
   vi.clearAllMocks()
 })
 
+describe('mergeHeaders', () => {
+  it('should merge diferent kinds of Headers', () => {
+    expect(
+      subject.mergeHeaders(new Headers({ a: '1' }), { b: '2' }, [['c', '3']]),
+    ).toEqual(new Headers({ a: '1', b: '2', c: '3' }))
+  })
+
+  it('should merge diferent kinds of Headers and override values', () => {
+    expect(
+      subject.mergeHeaders(new Headers({ a: '1' }), { a: '2' }, [['a', '3']]),
+    ).toEqual(new Headers({ a: '3' }))
+  })
+
+  it('should merge diferent kinds of Headers and delete undefined values', () => {
+    expect(
+      subject.mergeHeaders(new Headers({ a: '1' }), { a: undefined }),
+    ).toEqual(new Headers({}))
+    expect(
+      subject.mergeHeaders(new Headers({ a: '1' }), { a: 'undefined' }),
+    ).toEqual(new Headers({}))
+    expect(
+      subject.mergeHeaders(new Headers({ a: '1' }), [['a', undefined]]),
+    ).toEqual(new Headers({}))
+  })
+})
+
 describe('addQueryToInput', () => {
   it('should add the query object to a string input', () => {
     expect(
@@ -111,13 +137,12 @@ describe('ensureStringBody', () => {
 
 const reqMock = vi.fn()
 function successfulFetch(response: string | Record<string, unknown>) {
-  return async (request: RequestInfo | URL) => {
-    const req = request as Request
+  return async (input: URL | RequestInfo, init?: RequestInit | undefined) => {
     reqMock({
-      url: req.url,
-      headers: Object.fromEntries(req.headers),
-      method: req.method,
-      body: await req.text(),
+      url: input,
+      headers: init?.headers,
+      method: init?.method,
+      body: init?.body,
     })
     return new Response(
       typeof response === 'string' ? response : JSON.stringify(response),
@@ -206,12 +231,10 @@ describe('enhancedFetch', () => {
     })
     expect(reqMock).toHaveBeenCalledWith({
       url: 'https://example.com/api/users?admin=true',
-      headers: {
+      headers: new Headers({
         authorization: 'Bearer 123',
         'content-type': 'application/json',
-      },
-      method: 'GET',
-      body: '',
+      }),
     })
   })
 
@@ -225,7 +248,7 @@ describe('enhancedFetch', () => {
     })
     expect(reqMock).toHaveBeenCalledWith({
       url: 'https://example.com/api/users',
-      headers: { 'content-type': 'application/json' },
+      headers: new Headers({ 'content-type': 'application/json' }),
       method: 'POST',
       body: `{"id":1,"name":{"first":"John","last":"Doe"}}`,
     })
@@ -241,7 +264,7 @@ describe('enhancedFetch', () => {
     })
     expect(reqMock).toHaveBeenCalledWith({
       url: 'https://example.com/api/users',
-      headers: { 'content-type': 'application/json' },
+      headers: new Headers({ 'content-type': 'application/json' }),
       method: 'POST',
       body: `{"id":1,"name":{"first":"John","last":"Doe"}}`,
     })
@@ -261,7 +284,7 @@ describe('enhancedFetch', () => {
     expect(trace).toHaveBeenCalledWith(
       'https://example.com/api/users?admin=true',
       {
-        headers: { 'content-type': 'application/json' },
+        headers: new Headers({ 'content-type': 'application/json' }),
         method: 'POST',
         body: `{"id":1,"name":{"first":"John","last":"Doe"}}`,
       },
@@ -289,9 +312,8 @@ describe('makeService', () => {
     expect(result).toEqual({ foo: 'bar' })
     expect(reqMock).toHaveBeenCalledWith({
       url: 'https://example.com/api/users',
-      headers: { 'content-type': 'application/json' },
+      headers: new Headers({ 'content-type': 'application/json' }),
       method: 'POST',
-      body: '',
     })
   })
 
@@ -305,12 +327,11 @@ describe('makeService', () => {
     await api.get('/users')
     expect(reqMock).toHaveBeenCalledWith({
       url: 'https://example.com/api/users',
-      headers: {
+      headers: new Headers({
         authorization: 'Bearer 123',
         'content-type': 'application/json',
-      },
+      }),
       method: 'GET',
-      body: '',
     })
   })
 
@@ -328,8 +349,8 @@ describe('makeService', () => {
     expect(trace).toHaveBeenCalledWith(
       'https://example.com/api/users?admin=true',
       {
-        headers: { 'content-type': 'application/json' },
-        method: 'post',
+        headers: new Headers({ 'content-type': 'application/json' }),
+        method: 'POST',
         body: `{"id":1,"name":{"first":"John","last":"Doe"}}`,
       },
     )

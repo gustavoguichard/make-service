@@ -9,6 +9,35 @@ import type {
 } from './types'
 
 /**
+ * It merges multiple HeadersInit objects into a single Headers object
+ * @param entries Any number of HeadersInit objects
+ * @returns a new Headers object with the merged headers
+ */
+function mergeHeaders(
+  ...entries: (
+    | HeadersInit
+    | [string, undefined][]
+    | Record<string, undefined>
+  )[]
+) {
+  const result = new Map<string, string>()
+
+  for (const entry of entries) {
+    const headers = new Headers(entry as HeadersInit)
+
+    for (const [key, value] of headers.entries()) {
+      if (value === undefined || value === 'undefined') {
+        result.delete(key)
+      } else {
+        result.set(key, value)
+      }
+    }
+  }
+
+  return new Headers(Array.from(result.entries()))
+}
+
+/**
  * @param input a string or URL to which the query parameters will be added
  * @param searchParams the query parameters
  * @returns the input with the query parameters added with the same type as the input
@@ -94,14 +123,18 @@ async function enhancedFetch(
   requestInit?: EnhancedRequestInit,
 ) {
   const { query, trace, ...reqInit } = requestInit ?? {}
-  const headers = { 'content-type': 'application/json', ...reqInit.headers }
+  const headers = mergeHeaders(
+    {
+      'content-type': 'application/json',
+    },
+    reqInit.headers ?? {},
+  )
   const url = addQueryToInput(input, query)
   const body = ensureStringBody(reqInit.body)
 
   const enhancedReqInit = { ...reqInit, headers, body }
   trace?.(url, enhancedReqInit)
-  const request = new Request(url, enhancedReqInit)
-  const response = await fetch(request)
+  const response = await fetch(url, enhancedReqInit)
 
   return typedResponse(response)
 }
@@ -125,10 +158,11 @@ function makeService(baseURL: string, baseHeaders?: HeadersInit) {
    */
   const service = (method: HTTPMethod) => {
     return async (path: string, requestInit: ServiceRequestInit = {}) => {
-      const response = await enhancedFetch(`${baseURL}${path}`, {
+      const url = makeGetApiUrl(baseURL)(path)
+      const response = await enhancedFetch(url, {
         ...requestInit,
         method,
-        headers: { ...baseHeaders, ...requestInit?.headers },
+        headers: mergeHeaders(baseHeaders ?? {}, requestInit?.headers ?? {}),
       })
       return response
     }
@@ -151,5 +185,6 @@ export {
   enhancedFetch,
   makeService,
   makeGetApiUrl,
+  mergeHeaders,
   typedResponse,
 }
