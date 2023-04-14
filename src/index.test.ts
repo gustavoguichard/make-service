@@ -13,6 +13,32 @@ beforeEach(() => {
   vi.clearAllMocks()
 })
 
+describe('mergeHeaders', () => {
+  it('should merge diferent kinds of Headers', () => {
+    expect(
+      subject.mergeHeaders(new Headers({ a: '1' }), { b: '2' }, [['c', '3']]),
+    ).toEqual(new Headers({ a: '1', b: '2', c: '3' }))
+  })
+
+  it('should merge diferent kinds of Headers and override values', () => {
+    expect(
+      subject.mergeHeaders(new Headers({ a: '1' }), { a: '2' }, [['a', '3']]),
+    ).toEqual(new Headers({ a: '3' }))
+  })
+
+  it('should merge diferent kinds of Headers and delete undefined values', () => {
+    expect(
+      subject.mergeHeaders(new Headers({ a: '1' }), { a: undefined }),
+    ).toEqual(new Headers({}))
+    expect(
+      subject.mergeHeaders(new Headers({ a: '1' }), { a: 'undefined' }),
+    ).toEqual(new Headers({}))
+    expect(
+      subject.mergeHeaders(new Headers({ a: '1' }), [['a', undefined]]),
+    ).toEqual(new Headers({}))
+  })
+})
+
 describe('addQueryToInput', () => {
   it('should add the query object to a string input', () => {
     expect(
@@ -43,6 +69,20 @@ describe('addQueryToInput', () => {
     ).toBe('https://example.com/api?id=1&page=2')
   })
 
+  it('should append the query to a URL instance that already has QS', () => {
+    expect(
+      subject.addQueryToInput(new URL('https://example.com/api?id=1'), {
+        page: '2',
+      }),
+    ).toEqual(new URL('https://example.com/api?id=1&page=2'))
+    expect(
+      subject.addQueryToInput(
+        new URL('https://example.com/api?id=1'),
+        'page=2',
+      ),
+    ).toEqual(new URL('https://example.com/api?id=1&page=2'))
+  })
+
   it("should return the input in case there's no query", () => {
     expect(subject.addQueryToInput('https://example.com/api')).toBe(
       'https://example.com/api',
@@ -68,6 +108,18 @@ describe('makeGetApiUrl', () => {
     expect(getApiURL('/users', { active: 'true', page: '2' })).toBe(
       'https://example.com/api/users?active=true&page=2',
     )
+  })
+
+  it('should accept a URL as baseURL and remove extra slashes', () => {
+    expect(
+      subject.makeGetApiUrl(new URL('https://example.com/api'))('/users'),
+    ).toBe('https://example.com/api/users')
+    expect(
+      subject.makeGetApiUrl(new URL('https://example.com/api/'))('/users'),
+    ).toBe('https://example.com/api/users')
+    expect(
+      subject.makeGetApiUrl(new URL('https://example.com/api/'))('///users'),
+    ).toBe('https://example.com/api/users')
   })
 })
 
@@ -111,13 +163,12 @@ describe('ensureStringBody', () => {
 
 const reqMock = vi.fn()
 function successfulFetch(response: string | Record<string, unknown>) {
-  return async (request: RequestInfo | URL) => {
-    const req = request as Request
+  return async (input: URL | RequestInfo, init?: RequestInit | undefined) => {
     reqMock({
-      url: req.url,
-      headers: Object.fromEntries(req.headers),
-      method: req.method,
-      body: await req.text(),
+      url: input,
+      headers: init?.headers,
+      method: init?.method,
+      body: init?.body,
     })
     return new Response(
       typeof response === 'string' ? response : JSON.stringify(response),
@@ -206,12 +257,10 @@ describe('enhancedFetch', () => {
     })
     expect(reqMock).toHaveBeenCalledWith({
       url: 'https://example.com/api/users?admin=true',
-      headers: {
+      headers: new Headers({
         authorization: 'Bearer 123',
         'content-type': 'application/json',
-      },
-      method: 'GET',
-      body: '',
+      }),
     })
   })
 
@@ -225,7 +274,7 @@ describe('enhancedFetch', () => {
     })
     expect(reqMock).toHaveBeenCalledWith({
       url: 'https://example.com/api/users',
-      headers: { 'content-type': 'application/json' },
+      headers: new Headers({ 'content-type': 'application/json' }),
       method: 'POST',
       body: `{"id":1,"name":{"first":"John","last":"Doe"}}`,
     })
@@ -241,7 +290,7 @@ describe('enhancedFetch', () => {
     })
     expect(reqMock).toHaveBeenCalledWith({
       url: 'https://example.com/api/users',
-      headers: { 'content-type': 'application/json' },
+      headers: new Headers({ 'content-type': 'application/json' }),
       method: 'POST',
       body: `{"id":1,"name":{"first":"John","last":"Doe"}}`,
     })
@@ -261,7 +310,7 @@ describe('enhancedFetch', () => {
     expect(trace).toHaveBeenCalledWith(
       'https://example.com/api/users?admin=true',
       {
-        headers: { 'content-type': 'application/json' },
+        headers: new Headers({ 'content-type': 'application/json' }),
         method: 'POST',
         body: `{"id":1,"name":{"first":"John","last":"Doe"}}`,
       },
@@ -289,9 +338,8 @@ describe('makeService', () => {
     expect(result).toEqual({ foo: 'bar' })
     expect(reqMock).toHaveBeenCalledWith({
       url: 'https://example.com/api/users',
-      headers: { 'content-type': 'application/json' },
+      headers: new Headers({ 'content-type': 'application/json' }),
       method: 'POST',
-      body: '',
     })
   })
 
@@ -305,12 +353,11 @@ describe('makeService', () => {
     await api.get('/users')
     expect(reqMock).toHaveBeenCalledWith({
       url: 'https://example.com/api/users',
-      headers: {
+      headers: new Headers({
         authorization: 'Bearer 123',
         'content-type': 'application/json',
-      },
+      }),
       method: 'GET',
-      body: '',
     })
   })
 
@@ -328,8 +375,8 @@ describe('makeService', () => {
     expect(trace).toHaveBeenCalledWith(
       'https://example.com/api/users?admin=true',
       {
-        headers: { 'content-type': 'application/json' },
-        method: 'post',
+        headers: new Headers({ 'content-type': 'application/json' }),
+        method: 'POST',
         body: `{"id":1,"name":{"first":"John","last":"Doe"}}`,
       },
     )

@@ -9,6 +9,35 @@ import type {
 } from './types'
 
 /**
+ * It merges multiple HeadersInit objects into a single Headers object
+ * @param entries Any number of HeadersInit objects
+ * @returns a new Headers object with the merged headers
+ */
+function mergeHeaders(
+  ...entries: (
+    | HeadersInit
+    | [string, undefined][]
+    | Record<string, undefined>
+  )[]
+) {
+  const result = new Map<string, string>()
+
+  for (const entry of entries) {
+    const headers = new Headers(entry as HeadersInit)
+
+    for (const [key, value] of headers.entries()) {
+      if (value === undefined || value === 'undefined') {
+        result.delete(key)
+      } else {
+        result.set(key, value)
+      }
+    }
+  }
+
+  return new Headers(Array.from(result.entries()))
+}
+
+/**
  * @param input a string or URL to which the query parameters will be added
  * @param searchParams the query parameters
  * @returns the input with the query parameters added with the same type as the input
@@ -19,12 +48,16 @@ function addQueryToInput(
 ): string | URL {
   if (!searchParams) return input
 
-  if (searchParams && typeof input === 'string') {
+  if (typeof input === 'string') {
     const separator = input.includes('?') ? '&' : '?'
     return `${input}${separator}${new URLSearchParams(searchParams)}`
   }
   if (searchParams && input instanceof URL) {
-    input.search = new URLSearchParams(searchParams).toString()
+    for (const [key, value] of Object.entries(
+      new URLSearchParams(searchParams),
+    )) {
+      input.searchParams.set(key, value)
+    }
   }
   return input
 }
@@ -33,9 +66,12 @@ function addQueryToInput(
  * @param baseURL the base path to the API
  * @returns a function that receives a path and an object of query parameters and returns a URL
  */
-function makeGetApiUrl(baseURL: string) {
-  return (path: string, searchParams?: SearchParams): string | URL =>
-    addQueryToInput(`${baseURL}${path}`, searchParams)
+function makeGetApiUrl(baseURL: string | URL) {
+  const base = baseURL instanceof URL ? baseURL.toString() : baseURL
+  return (path: string, searchParams?: SearchParams): string | URL => {
+    const url = `${base}${path}`.replace(/([^https?:]\/)\/+/g, '$1')
+    return addQueryToInput(url, searchParams)
+  }
 }
 
 /**
@@ -94,14 +130,18 @@ async function enhancedFetch(
   requestInit?: EnhancedRequestInit,
 ) {
   const { query, trace, ...reqInit } = requestInit ?? {}
-  const headers = { 'content-type': 'application/json', ...reqInit.headers }
+  const headers = mergeHeaders(
+    {
+      'content-type': 'application/json',
+    },
+    reqInit.headers ?? {},
+  )
   const url = addQueryToInput(input, query)
   const body = ensureStringBody(reqInit.body)
 
   const enhancedReqInit = { ...reqInit, headers, body }
   trace?.(url, enhancedReqInit)
-  const request = new Request(url, enhancedReqInit)
-  const response = await fetch(request)
+  const response = await fetch(url, enhancedReqInit)
 
   return typedResponse(response)
 }
@@ -117,7 +157,7 @@ async function enhancedFetch(
  * const users = await response.json(userSchema);
  * //    ^? User[]
  */
-function makeService(baseURL: string, baseHeaders?: HeadersInit) {
+function makeService(baseURL: string | URL, baseHeaders?: HeadersInit) {
   /**
    * A function that receives a path and requestInit and returns a serialized json response that can be typed or not.
    * @param method the HTTP method
@@ -125,10 +165,11 @@ function makeService(baseURL: string, baseHeaders?: HeadersInit) {
    */
   const service = (method: HTTPMethod) => {
     return async (path: string, requestInit: ServiceRequestInit = {}) => {
-      const response = await enhancedFetch(`${baseURL}${path}`, {
+      const url = makeGetApiUrl(baseURL)(path)
+      const response = await enhancedFetch(url, {
         ...requestInit,
         method,
-        headers: { ...baseHeaders, ...requestInit?.headers },
+        headers: mergeHeaders(baseHeaders ?? {}, requestInit?.headers ?? {}),
       })
       return response
     }
@@ -139,7 +180,7 @@ function makeService(baseURL: string, baseHeaders?: HeadersInit) {
    */
   return new Proxy({} as { [K in HTTPMethod]: ReturnType<typeof service> }, {
     get(_target, prop) {
-      if (isHTTPMethod(prop)) return service(prop)
+      if (isHTTPMethod(prop)) return service(prop.toUpperCase() as HTTPMethod)
       throw new Error(`Invalid HTTP method: ${prop.toString()}`)
     },
   })
@@ -151,5 +192,6 @@ export {
   enhancedFetch,
   makeService,
   makeGetApiUrl,
+  mergeHeaders,
   typedResponse,
 }
