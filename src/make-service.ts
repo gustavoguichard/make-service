@@ -180,7 +180,7 @@ function makeService(baseURL: string | URL, baseHeaders?: HeadersInit) {
    */
   return new Proxy({} as { [K in HTTPMethod]: ReturnType<typeof service> }, {
     get(_target, prop) {
-      if (isHTTPMethod(prop)) return service(prop)
+      if (isHTTPMethod(prop)) return service(prop.toUpperCase() as HTTPMethod)
       throw new Error(`Invalid HTTP method: ${prop.toString()}`)
     },
   })
