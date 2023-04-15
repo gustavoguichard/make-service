@@ -1,11 +1,19 @@
 import { HTTP_METHODS } from './constants'
-import { getJson, getText, replaceUrlParams, typeOf } from './internals'
+import {
+  getJson,
+  getText,
+  isHTTPMethod,
+  replaceUrlParams,
+  typeOf,
+} from './internals'
 import {
   EnhancedRequestInit,
   HTTPMethod,
   JSONValue,
+  Route,
   SearchParams,
   ServiceRequestInit,
+  StrictReqInit,
   TypedResponse,
 } from './types'
 
@@ -166,9 +174,10 @@ async function enhancedFetch(
  * const users = await response.json(userSchema);
  * //    ^? User[]
  */
-function makeService(
+function makeService<const T extends Route>(
   baseURL: string | URL,
   baseHeaders?: HeadersInit | (() => HeadersInit | Promise<HeadersInit>),
+  routes?: T[],
 ) {
   /**
    * A function that receives a path and requestInit and returns a serialized json response that can be typed or not.
@@ -192,12 +201,36 @@ function makeService(
     }
   }
 
-  let api = {} as Record<Lowercase<HTTPMethod>, ReturnType<typeof service>>
-  for (const method of HTTP_METHODS) {
-    const lowerMethod = method.toLowerCase() as Lowercase<HTTPMethod>
-    api[lowerMethod] = service(method)
-  }
-  return api
+  const methodsSet = routes
+    ? Array.from(new Set(routes.map((route) => route.method)))
+    : HTTP_METHODS
+
+  /**
+   * It returns a proxy that returns the service function for each HTTP method
+   */
+  return new Proxy(
+    {} as typeof routes extends undefined
+      ? { [K in Lowercase<HTTPMethod>]: ReturnType<typeof service> }
+      : {
+          [K in T['method'] as Lowercase<T['method']>]: <
+            R extends Extract<T, { method: K }>,
+            P extends R['path'],
+          >(
+            path: P,
+            requestInit?: StrictReqInit<Extract<R, { method: K; path: P }>>,
+          ) => Promise<TypedResponse>
+        },
+    {
+      get(_target, prop) {
+        const method = String(prop).toUpperCase() as HTTPMethod
+        if (isHTTPMethod(method) && methodsSet.includes(method)) {
+          return service(method)
+        }
+
+        throw new Error(`Invalid HTTP method: ${prop.toString()}`)
+      },
+    },
+  )
 }
 
 export {

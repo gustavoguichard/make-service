@@ -363,13 +363,29 @@ describe('enhancedFetch', () => {
 })
 
 describe('makeService', () => {
-  it('should return an object with http methods', () => {
-    const api = subject.makeService('https://example.com/api')
-    for (const method of HTTP_METHODS) {
-      expect(
-        typeof api[method.toLocaleLowerCase() as Lowercase<subject.HTTPMethod>],
-      ).toBe('function')
-    }
+  describe('when routes not given', () => {
+    it('should return an object with http methods', () => {
+      const api = subject.makeService('https://example.com/api')
+      for (const method of HTTP_METHODS) {
+        expect(typeof api[method.toLocaleLowerCase() as keyof typeof api]).toBe(
+          'function',
+        )
+      }
+    })
+  })
+
+  describe('when routes are given', () => {
+    it('should return an object with just http methods for the given routes', () => {
+      const api = subject.makeService('https://example.com/api', {}, [
+        { method: 'GET', path: '/' },
+      ])
+      expect(typeof api.get).toBe('function')
+      for (const method of HTTP_METHODS.filter((m) => m !== 'GET')) {
+        expect(
+          () => typeof api[method.toLocaleLowerCase() as keyof typeof api],
+        ).toThrowError(`Invalid HTTP method: ${method.toLowerCase()}`)
+      }
+    })
   })
 
   it('should return an API with enhancedFetch', async () => {
