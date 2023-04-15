@@ -1,5 +1,6 @@
 export {
   addQueryToInput,
+  addQueryToUrl,
   ensureStringBody,
   enhancedFetch,
   makeService,

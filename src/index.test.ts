@@ -39,36 +39,36 @@ describe('mergeHeaders', () => {
   })
 })
 
-describe('addQueryToInput', () => {
+describe('addQueryToUrl', () => {
   it('should add the query object to a string input', () => {
+    expect(subject.addQueryToUrl('https://example.com/api', { id: '1' })).toBe(
+      'https://example.com/api?id=1',
+    )
     expect(
-      subject.addQueryToInput('https://example.com/api', { id: '1' }),
-    ).toBe('https://example.com/api?id=1')
-    expect(
-      subject.addQueryToInput('https://example.com/api', 'page=2&foo=bar'),
+      subject.addQueryToUrl('https://example.com/api', 'page=2&foo=bar'),
     ).toBe('https://example.com/api?page=2&foo=bar')
   })
 
   it('should add the query object to a URL input', () => {
     expect(
-      subject.addQueryToInput(new URL('https://example.com/api'), {
+      subject.addQueryToUrl(new URL('https://example.com/api'), {
         id: '1',
       }),
     ).toEqual(new URL('https://example.com/api?id=1'))
     expect(
-      subject.addQueryToInput(new URL('https://example.com/api'), 'page=2'),
+      subject.addQueryToUrl(new URL('https://example.com/api'), 'page=2'),
     ).toEqual(new URL('https://example.com/api?page=2'))
   })
 
   it('should append the query to a URL string that already has QS', () => {
     expect(
-      subject.addQueryToInput('https://example.com/api?id=1', { page: '2' }),
+      subject.addQueryToUrl('https://example.com/api?id=1', { page: '2' }),
     ).toBe('https://example.com/api?id=1&page=2')
     expect(
-      subject.addQueryToInput('https://example.com/api?id=1', 'page=2'),
+      subject.addQueryToUrl('https://example.com/api?id=1', 'page=2'),
     ).toBe('https://example.com/api?id=1&page=2')
     expect(
-      subject.addQueryToInput(
+      subject.addQueryToUrl(
         'https://example.com/api?id=1',
         new URLSearchParams({ page: '2' }),
       ),
@@ -77,18 +77,15 @@ describe('addQueryToInput', () => {
 
   it('should append the query to a URL instance that already has QS', () => {
     expect(
-      subject.addQueryToInput(new URL('https://example.com/api?id=1'), {
+      subject.addQueryToUrl(new URL('https://example.com/api?id=1'), {
         page: '2',
       }),
     ).toEqual(new URL('https://example.com/api?id=1&page=2'))
     expect(
-      subject.addQueryToInput(
-        new URL('https://example.com/api?id=1'),
-        'page=2',
-      ),
+      subject.addQueryToUrl(new URL('https://example.com/api?id=1'), 'page=2'),
     ).toEqual(new URL('https://example.com/api?id=1&page=2'))
     expect(
-      subject.addQueryToInput(
+      subject.addQueryToUrl(
         new URL('https://example.com/api?id=1'),
         new URLSearchParams({ page: '2' }),
       ),
@@ -96,10 +93,10 @@ describe('addQueryToInput', () => {
   })
 
   it("should return the input in case there's no query", () => {
-    expect(subject.addQueryToInput('https://example.com/api')).toBe(
+    expect(subject.addQueryToUrl('https://example.com/api')).toBe(
       'https://example.com/api',
     )
-    expect(subject.addQueryToInput(new URL('https://example.com/api'))).toEqual(
+    expect(subject.addQueryToUrl(new URL('https://example.com/api'))).toEqual(
       new URL('https://example.com/api'),
     )
   })

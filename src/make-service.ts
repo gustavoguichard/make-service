@@ -38,29 +38,33 @@ function mergeHeaders(
 }
 
 /**
- * @param input a string or URL to which the query parameters will be added
+ * @param url a string or URL to which the query parameters will be added
  * @param searchParams the query parameters
- * @returns the input with the query parameters added with the same type as the input
+ * @returns the url with the query parameters added with the same type as the url
  */
-function addQueryToInput(
-  input: string | URL,
+function addQueryToUrl(
+  url: string | URL,
   searchParams?: SearchParams,
 ): string | URL {
-  if (!searchParams) return input
+  if (!searchParams) return url
 
-  if (typeof input === 'string') {
-    const separator = input.includes('?') ? '&' : '?'
-    return `${input}${separator}${new URLSearchParams(searchParams)}`
+  if (typeof url === 'string') {
+    const separator = url.includes('?') ? '&' : '?'
+    return `${url}${separator}${new URLSearchParams(searchParams)}`
   }
-  if (searchParams && input instanceof URL) {
+  if (searchParams && url instanceof URL) {
     for (const [key, value] of Object.entries(
       new URLSearchParams(searchParams),
     )) {
-      input.searchParams.set(key, value)
+      url.searchParams.set(key, value)
     }
   }
-  return input
+  return url
 }
+/**
+ * @deprecated method renamed to addQueryToUrl
+ */
+const addQueryToInput = addQueryToUrl
 
 /**
  * @param baseURL the base path to the API
@@ -70,7 +74,7 @@ function makeGetApiUrl(baseURL: string | URL) {
   const base = baseURL instanceof URL ? baseURL.toString() : baseURL
   return (path: string, searchParams?: SearchParams): string | URL => {
     const url = `${base}${path}`.replace(/([^https?:]\/)\/+/g, '$1')
-    return addQueryToInput(url, searchParams)
+    return addQueryToUrl(url, searchParams)
   }
 }
 
@@ -113,7 +117,7 @@ function ensureStringBody(body?: JSONValue): string | undefined {
 
 /**
  *
- * @param input a string or URL to be fetched
+ * @param url a string or URL to be fetched
  * @param requestInit the requestInit to be passed to the fetch request. It is the same as the `RequestInit` type, but it also accepts a JSON-like `body` and an object-like `query` parameter.
  * @param requestInit.body the body of the request. It will be automatically stringified so you can send a JSON-like object
  * @param requestInit.query the query parameters to be added to the URL
@@ -126,7 +130,7 @@ function ensureStringBody(body?: JSONValue): string | undefined {
  * //    ^? unknown
  */
 async function enhancedFetch(
-  input: string | URL,
+  url: string | URL,
   requestInit?: EnhancedRequestInit,
 ) {
   const { query, trace, ...reqInit } = requestInit ?? {}
@@ -188,6 +192,7 @@ function makeService(baseURL: string | URL, baseHeaders?: HeadersInit) {
 
 export {
   addQueryToInput,
+  addQueryToUrl,
   ensureStringBody,
   enhancedFetch,
   makeService,
