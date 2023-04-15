@@ -256,6 +256,24 @@ describe('enhancedFetch', () => {
     })
   })
 
+  it('should replace params in the URL', async () => {
+    vi.spyOn(global, 'fetch').mockImplementationOnce(
+      successfulFetch({ foo: 'bar' }),
+    )
+    await subject.enhancedFetch(
+      'https://example.com/api/users/:user/page/:page',
+      {
+        params: { user: '1', page: '2', foo: 'bar' },
+      },
+    )
+    expect(reqMock).toHaveBeenCalledWith({
+      url: 'https://example.com/api/users/1/page/2',
+      headers: new Headers({
+        'content-type': 'application/json',
+      }),
+    })
+  })
+
   it('should accept a requestInit and a query', async () => {
     vi.spyOn(global, 'fetch').mockImplementationOnce(
       successfulFetch({ foo: 'bar' }),

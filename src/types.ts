@@ -20,6 +20,7 @@ type TypedResponse = Omit<Response, 'json' | 'text'> & {
 type EnhancedRequestInit = Omit<RequestInit, 'body'> & {
   body?: JSONValue
   query?: SearchParams
+  params?: Record<string, string>
   trace?: (...args: Parameters<typeof fetch>) => void
 }
 
@@ -30,10 +31,23 @@ type HTTPMethod = (typeof HTTP_METHODS)[number]
 type TypedResponseJson = ReturnType<typeof getJson>
 type TypedResponseText = ReturnType<typeof getText>
 
+type Prettify<T> = {
+  [K in keyof T]: T[K]
+} & {}
+
+type NoEmpty<T> = keyof T extends never ? never : T
+type PathParams<T extends string> = NoEmpty<
+  T extends `${infer _}:${infer Param}/${infer Rest}`
+    ? Prettify<{ [K in Param]: string } & PathParams<Rest>>
+    : T extends `${infer _}:${infer Param}`
+    ? { [K in Param]: string }
+    : {}
+>
 export type {
   EnhancedRequestInit,
   HTTPMethod,
   JSONValue,
+  PathParams,
   Schema,
   SearchParams,
   ServiceRequestInit,

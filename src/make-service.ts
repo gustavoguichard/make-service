@@ -1,5 +1,5 @@
-import { getJson, getText, isHTTPMethod } from './internals'
-import type {
+import { getJson, getText, isHTTPMethod, replaceUrlParams } from './internals'
+import {
   EnhancedRequestInit,
   HTTPMethod,
   JSONValue,
@@ -140,12 +140,13 @@ async function enhancedFetch(
     },
     reqInit.headers ?? {},
   )
-  const url = addQueryToInput(input, query)
+  const withParams = replaceUrlParams(url, reqInit.params ?? {})
+  const fullUrl = addQueryToUrl(withParams, query)
   const body = ensureStringBody(reqInit.body)
 
   const enhancedReqInit = { ...reqInit, headers, body }
-  trace?.(url, enhancedReqInit)
-  const response = await fetch(url, enhancedReqInit)
+  trace?.(fullUrl, enhancedReqInit)
+  const response = await fetch(fullUrl, enhancedReqInit)
 
   return typedResponse(response)
 }
