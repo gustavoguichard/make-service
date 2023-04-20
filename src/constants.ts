@@ -1,11 +1,11 @@
 const HTTP_METHODS = [
-  'get',
-  'post',
-  'put',
-  'delete',
-  'patch',
-  'options',
-  'head',
+  'GET',
+  'POST',
+  'PUT',
+  'DELETE',
+  'PATCH',
+  'OPTIONS',
+  'HEAD',
 ] as const
 
 export { HTTP_METHODS }

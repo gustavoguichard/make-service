@@ -1,5 +1,5 @@
 import { HTTP_METHODS } from './constants'
-import { HTTPMethod, Schema } from './types'
+import { HTTPMethod, EnhancedRequestInit, Schema } from './types'
 
 /**
  * It returns the JSON object or throws an error if the response is not ok.
@@ -31,4 +31,23 @@ function isHTTPMethod(method: string | symbol): method is HTTPMethod {
   return HTTP_METHODS.includes(method as HTTPMethod)
 }
 
-export { getJson, getText, isHTTPMethod }
+/**
+ *
+ * @param url the url string or URL object to replace the params
+ * @param params the params map to be replaced in the url
+ * @returns the url with the params replaced and with the same type as the given url
+ */
+function replaceUrlParams(
+  url: string | URL,
+  params: EnhancedRequestInit['params'],
+) {
+  if (!params) return url
+
+  let urlString = String(url)
+  Object.entries(params).forEach(([key, value]) => {
+    urlString = urlString.replace(new RegExp(`:${key}($|\/)`), `${value}$1`)
+  })
+  return url instanceof URL ? new URL(urlString) : urlString
+}
+
+export { getJson, getText, isHTTPMethod, replaceUrlParams }

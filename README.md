@@ -76,7 +76,7 @@ Its [`typedResponse`](#typedresponse) can also be parsed with a zod schema. Here
 ```ts
 const response = await api.get("/users", {
   query: { search: "John" },
-  trace: (input, requestInit) => console.log(input, requestInit),
+  trace: (url, requestInit) => console.log(url, requestInit),
 })
 const json = await response.json(
   z.object({
@@ -153,7 +153,7 @@ const json = await response.json()
 // You can pass it a generic or schema to type the result
 ```
 
-This function accepts the same arguments as the `fetch` API - with exception of [JSON-like body](/src/make-service.ts) -, and it also accepts an object-like [`query`](/src/make-service.ts) and a `trace` function that will be called with the `input` and `requestInit` arguments.
+This function accepts the same arguments as the `fetch` API - with exception of [JSON-like body](/src/make-service.ts) -, and it also accepts an object-like [`query`](/src/make-service.ts) and a `trace` function that will be called with the `url` and `requestInit` arguments.
 
 This slightly different `RequestInit` is typed as `EnhancedRequestInit`.
 
@@ -164,7 +164,7 @@ await enhancedFetch("https://example.com/api/users", {
   method: 'POST',
   body: { some: { object: { as: { body } } } },
   query: { page: "1" },
-  trace: (input, requestInit) => console.log(input, requestInit)
+  trace: (url, requestInit) => console.log(url, requestInit)
 })
 
 // The trace function will be called with the following arguments:
