@@ -349,7 +349,9 @@ describe('makeService', () => {
   it('should return an object with http methods', () => {
     const api = subject.makeService('https://example.com/api')
     for (const method of HTTP_METHODS) {
-      expect(typeof api[method]).toBe('function')
+      expect(
+        typeof api[method.toLocaleLowerCase() as Lowercase<subject.HTTPMethod>],
+      ).toBe('function')
     }
   })
 

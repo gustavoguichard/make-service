@@ -1,3 +1,4 @@
+import { HTTP_METHODS } from './constants'
 import { getJson, getText, isHTTPMethod, replaceUrlParams } from './internals'
 import {
   EnhancedRequestInit,
@@ -180,15 +181,12 @@ function makeService(baseURL: string | URL, baseHeaders?: HeadersInit) {
     }
   }
 
-  /**
-   * It returns a proxy that returns the service function for each HTTP method
-   */
-  return new Proxy({} as { [K in HTTPMethod]: ReturnType<typeof service> }, {
-    get(_target, prop) {
-      if (isHTTPMethod(prop)) return service(prop.toUpperCase() as HTTPMethod)
-      throw new Error(`Invalid HTTP method: ${prop.toString()}`)
-    },
-  })
+  let api = {} as Record<Lowercase<HTTPMethod>, ReturnType<typeof service>>
+  for (const method of HTTP_METHODS) {
+    const lowerMethod = method.toLowerCase() as Lowercase<HTTPMethod>
+    api[lowerMethod] = service(method)
+  }
+  return api
 }
 
 export {
