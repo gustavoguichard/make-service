@@ -8,6 +8,7 @@ It adds a set of little features and allows you to parse responses with [zod](ht
 - 🤩 Type-safe return of `response.json()` and `response.text()`. Defaults to `unknown` instead of `any`.
 - 🚦 Easily setup an API with a `baseURL` and common `headers` for every request.
 - 🏗️ Compose URL from the base by just calling the endpoints and an object-like `query`.
+- 🐾 Replaces URL wildcards with an object of `params`.
 - 🧙‍♀️ Automatically stringifies the `body` of a request so you can give it a JSON-like structure.
 - 🐛 Accepts a `trace` function for debugging.
 
@@ -153,22 +154,23 @@ const json = await response.json()
 // You can pass it a generic or schema to type the result
 ```
 
-This function accepts the same arguments as the `fetch` API - with exception of [JSON-like body](/src/make-service.ts) -, and it also accepts an object-like [`query`](/src/make-service.ts) and a `trace` function that will be called with the `url` and `requestInit` arguments.
+This function accepts the same arguments as the `fetch` API - with exception of [JSON-like body](/src/make-service.ts) -, and it also accepts an object of `params` to replace URL wildcards, an object-like [`query`](/src/make-service.ts) and a `trace` function that will be called with the `url` and `requestInit` arguments.
 
 This slightly different `RequestInit` is typed as `EnhancedRequestInit`.
 
 ```ts
 import { enhancedFetch } from 'make-service'
 
-await enhancedFetch("https://example.com/api/users", {
+await enhancedFetch("https://example.com/api/users/:role", {
   method: 'POST',
   body: { some: { object: { as: { body } } } },
   query: { page: "1" },
+  params: { role: "admin" },
   trace: (url, requestInit) => console.log(url, requestInit)
 })
 
 // The trace function will be called with the following arguments:
-// "https://example.com/api/users?page=1"
+// "https://example.com/api/users/admin?page=1"
 // {
 //   method: 'POST',
 //   body: '{"some":{"object":{"as":{"body":{}}}}}',

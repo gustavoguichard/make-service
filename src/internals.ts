@@ -41,6 +41,7 @@ function replaceUrlParams(
   url: string | URL,
   params: EnhancedRequestInit['params'],
 ) {
+  // TODO: use the URL Pattern API as soon as it has better browser support
   if (!params) return url
 
   let urlString = String(url)
