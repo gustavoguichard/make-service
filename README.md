@@ -61,7 +61,7 @@ This library exports the `makeService` function and some primitives used to buil
 ## makeService
 The main function of this lib is built on top of the primitives described in the following sections. It allows you to create a service object with a `baseURL` and common `headers` for every request.
 
-This service object can be called with every HTTP method and it will return a [`typedResponse`](#typedresponse) object as it uses the [`enhancedFetch`](#enhancedfetch) internally.
+This service object can be called with every HTTP method and it will return a [`typedResponse`](#typedresponse).
 
 ```ts
 import { makeService } from 'make-service'
@@ -75,7 +75,7 @@ const json = await response.json()
 //    ^? unknown
 ```
 
-On the example above, the `service.get` will call the [`enhancedFetch`](#enhancedfetch) with the following arguments:
+On the example above, the request will be sent with the following arguments:
 
 ```ts
 // "https://example.com/api/users"
@@ -87,8 +87,6 @@ On the example above, the `service.get` will call the [`enhancedFetch`](#enhance
 //   }
 // }
 ```
-
-The `service` object above can be called with the same arguments as the [`enhancedFetch`](#enhancedfetch), such as `query`, object-like `body`, and `trace`.
 
 ### Type-checking the response body
 The `response` object returned by the `service` can be type-casted with a given generic type. This will type-check the `response.json()` and `response.text()` methods.
@@ -137,7 +135,7 @@ await service.options("/users")
 ```
 
 ### Headers
-The `headers` argument can be a `Headers` object, an object with string keys and values, or an array of `[key, value]` tuples.
+The `headers` argument can be a `Headers` object, a `Record<string, string>`, or an array of `[key, value]` tuples (entries).
 The `baseHeaders` and the `headers` will be merged together, with the `headers` taking precedence.
 
 ```ts
@@ -305,7 +303,7 @@ const json = await response.json()
 // You can pass it a generic or schema to type the result
 ```
 
-This function accepts the same arguments as the `fetch` API - with exception of [JSON-like body](#body) -, and it also accepts an object of [`params`](#params) to replace URL wildcards, an object-like [`query`](#query), and a [`trace`](#trace) function that will be called with the `url` and `requestInit` arguments.
+This function accepts the same arguments as the `fetch` API - with exception of [JSON-like body](#body) -, and it also accepts an object of [`params`](#params) to replace URL wildcards, an object-like [`query`](#query), and a [`trace`](#trace) function. Those are all described above in [`makeService`](#make-service).
 
 This slightly different `RequestInit` is typed as `EnhancedRequestInit`.
 
@@ -317,7 +315,7 @@ await enhancedFetch("https://example.com/api/users/:role", {
   body: { some: { object: { as: { body } } } },
   query: { page: "1" },
   params: { role: "admin" },
-  trace: (url, requestInit) => console.log(url, requestInit)
+  trace: console.log,
 })
 
 // The trace function will be called with the following arguments:
