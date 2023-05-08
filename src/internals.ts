@@ -1,5 +1,4 @@
-import { HTTP_METHODS } from './constants'
-import { HTTPMethod, EnhancedRequestInit, Schema } from './types'
+import { EnhancedRequestInit, Schema } from './types'
 
 /**
  * It returns the JSON object or throws an error if the response is not ok.
@@ -8,9 +7,6 @@ import { HTTPMethod, EnhancedRequestInit, Schema } from './types'
  */
 function getJson(response: Response) {
   return async <T = unknown>(schema?: Schema<T>): Promise<T> => {
-    if (!response.ok) {
-      throw new Error(await response.text())
-    }
     const json = await response.json()
     return schema ? schema.parse(json) : (json as T)
   }
@@ -25,10 +21,6 @@ function getText(response: Response) {
     const text = await response.text()
     return schema ? schema.parse(text) : (text as T)
   }
-}
-
-function isHTTPMethod(method: string | symbol): method is HTTPMethod {
-  return HTTP_METHODS.includes(method as HTTPMethod)
 }
 
 /**
@@ -51,4 +43,4 @@ function replaceUrlParams(
   return url instanceof URL ? new URL(urlString) : urlString
 }
 
-export { getJson, getText, isHTTPMethod, replaceUrlParams }
+export { getJson, getText, replaceUrlParams }
