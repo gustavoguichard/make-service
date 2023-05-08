@@ -159,7 +159,10 @@ async function enhancedFetch(
  * const users = await response.json(userSchema);
  * //    ^? User[]
  */
-function makeService(baseURL: string | URL, baseHeaders?: HeadersInit) {
+function makeService(
+  baseURL: string | URL,
+  baseHeaders?: HeadersInit | (() => HeadersInit | Promise<HeadersInit>),
+) {
   /**
    * A function that receives a path and requestInit and returns a serialized json response that can be typed or not.
    * @param method the HTTP method
@@ -171,7 +174,12 @@ function makeService(baseURL: string | URL, baseHeaders?: HeadersInit) {
       const response = await enhancedFetch(url, {
         ...requestInit,
         method,
-        headers: mergeHeaders(baseHeaders ?? {}, requestInit?.headers ?? {}),
+        headers: mergeHeaders(
+          typeof baseHeaders === 'function'
+            ? await baseHeaders()
+            : baseHeaders ?? {},
+          requestInit?.headers ?? {},
+        ),
       })
       return response
     }
