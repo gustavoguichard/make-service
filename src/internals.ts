@@ -27,10 +27,6 @@ function getText(response: Response) {
   }
 }
 
-function isHTTPMethod(method: string | symbol): method is HTTPMethod {
-  return HTTP_METHODS.includes(method as HTTPMethod)
-}
-
 /**
  *
  * @param url the url string or URL object to replace the params
@@ -51,4 +47,4 @@ function replaceUrlParams(
   return url instanceof URL ? new URL(urlString) : urlString
 }
 
-export { getJson, getText, isHTTPMethod, replaceUrlParams }
+export { getJson, getText, replaceUrlParams }

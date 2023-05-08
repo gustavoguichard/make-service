@@ -1,5 +1,5 @@
 import { HTTP_METHODS } from './constants'
-import { getJson, getText, isHTTPMethod, replaceUrlParams } from './internals'
+import { getJson, getText, replaceUrlParams } from './internals'
 import {
   EnhancedRequestInit,
   HTTPMethod,
