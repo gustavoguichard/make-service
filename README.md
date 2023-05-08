@@ -88,7 +88,7 @@ On the example above, the `service.get` will call the [`enhancedFetch`](#enhance
 // }
 ```
 
-The `api` object can be called with the same arguments as the [`enhancedFetch`](#enhancedfetch), such as `query`, object-like `body`, and `trace`.
+The `service` object above can be called with the same arguments as the [`enhancedFetch`](#enhancedfetch), such as `query`, object-like `body`, and `trace`.
 
 ### Type-checking the response body
 The `response` object returned by the `service` can be type-casted with a given generic type. This will type-check the `response.json()` and `response.text()` methods.
