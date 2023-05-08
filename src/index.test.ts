@@ -162,11 +162,28 @@ describe('ensureStringBody', () => {
   })
 
   it('should return the same if body was not defined', () => {
-    expect(subject.ensureStringBody()).toBe(undefined)
+    expect(subject.ensureStringBody()).toBeUndefined()
   })
 
   it('should stringify the body if it is a JSON-like value', () => {
     expect(subject.ensureStringBody({ page: 2 })).toBe(`{"page":2}`)
+    expect(subject.ensureStringBody([1, 2])).toBe(`[1,2]`)
+    expect(subject.ensureStringBody(3)).toBe(`3`)
+    expect(subject.ensureStringBody(true)).toBe(`true`)
+    expect(subject.ensureStringBody({})).toBe(`{}`)
+  })
+
+  it('should not stringify other valid kinds of BodyInit', () => {
+    const ab = new ArrayBuffer(0)
+    expect(subject.ensureStringBody(ab)).toBe(ab)
+    const rs = new ReadableStream()
+    expect(subject.ensureStringBody(rs)).toBe(rs)
+    const fd = new FormData()
+    expect(subject.ensureStringBody(fd)).toBe(fd)
+    const usp = new URLSearchParams()
+    expect(subject.ensureStringBody(usp)).toBe(usp)
+    const blob = new Blob()
+    expect(subject.ensureStringBody(blob)).toBe(blob)
   })
 })
 

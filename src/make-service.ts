@@ -1,5 +1,5 @@
 import { HTTP_METHODS } from './constants'
-import { getJson, getText, replaceUrlParams } from './internals'
+import { getJson, getText, replaceUrlParams, typeOf } from './internals'
 import {
   EnhancedRequestInit,
   HTTPMethod,
@@ -104,12 +104,19 @@ function typedResponse(response: Response): TypedResponse {
 
 /**
  * @param body the JSON-like body of the request
- * @returns the body stringified if it is not a string
+ * @returns the body is stringified if it is not a string and it is a JSON-like object. It also accepts other types of BodyInit such as Blob, ReadableStream, etc.
  */
-function ensureStringBody(body?: JSONValue): string | undefined {
-  if (typeof body === 'undefined') return
-  if (typeof body === 'string') return body
-  return JSON.stringify(body)
+function ensureStringBody<B extends JSONValue | BodyInit | null>(
+  body?: B,
+): B extends JSONValue ? string : B {
+  if (typeof body === 'undefined') return body as never
+  if (typeof body === 'string') return body as never
+
+  return (
+    ['number', 'boolean', 'array', 'object'].includes(typeOf(body))
+      ? JSON.stringify(body)
+      : body
+  ) as never
 }
 
 /**
