@@ -1,5 +1,4 @@
-import { HTTP_METHODS } from './constants'
-import { HTTPMethod, EnhancedRequestInit, Schema } from './types'
+import { EnhancedRequestInit, Schema } from './types'
 
 /**
  * It returns the JSON object or throws an error if the response is not ok.
@@ -8,9 +7,6 @@ import { HTTPMethod, EnhancedRequestInit, Schema } from './types'
  */
 function getJson(response: Response) {
   return async <T = unknown>(schema?: Schema<T>): Promise<T> => {
-    if (!response.ok) {
-      throw new Error(await response.text())
-    }
     const json = await response.json()
     return schema ? schema.parse(json) : (json as T)
   }
