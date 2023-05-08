@@ -1,5 +1,4 @@
 export {
-  addQueryToInput,
   addQueryToUrl,
   ensureStringBody,
   enhancedFetch,
