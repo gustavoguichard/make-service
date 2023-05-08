@@ -28,7 +28,6 @@ const users = await response.json(usersSchema);
 - [Installation](#installation)
 - [API](#api)
   - [makeService](#makeservice)
-    - [Usage](#usage)
     - [Type-checking the response body](#type-checking-the-response-body)
     - [Runtime type-checking and parsing the response body](#runtime-type-checking-and-parsing-the-response-body)
     - [Supported HTTP Verbs](#supported-http-verbs)
@@ -60,8 +59,6 @@ import { makeService } from "https://deno.land/x/make_service/mod.ts";
 This library exports the `makeService` function and some primitives used to build it. You can use the primitives as you wish but the `makeService` will have all the features combined.
 
 ## makeService
-
-### Usage
 The main function of this lib is built on top of the primitives described in the following sections. It allows you to create a service object with a `baseURL` and common `headers` for every request.
 
 This service object can be called with every HTTP method and it will return a [`typedResponse`](#typedresponse) object as it uses the [`enhancedFetch`](#enhancedfetch) internally.
