@@ -1,11 +1,19 @@
 import { HTTP_METHODS } from './constants'
-import { getJson, getText, replaceUrlParams, typeOf } from './internals'
+import {
+  getJson,
+  getText,
+  isHTTPMethod,
+  replaceUrlParams,
+  typeOf,
+} from './internals'
 import {
   EnhancedRequestInit,
   HTTPMethod,
   JSONValue,
+  Route,
   SearchParams,
   ServiceRequestInit,
+  StrictReqInit,
   TypedResponse,
 } from './types'
 
@@ -166,9 +174,10 @@ async function enhancedFetch(
  * const users = await response.json(userSchema);
  * //    ^? User[]
  */
-function makeService(
+function makeService<const T extends Route>(
   baseURL: string | URL,
   baseHeaders?: HeadersInit | (() => HeadersInit | Promise<HeadersInit>),
+  routes?: T[],
 ) {
   /**
    * A function that receives a path and requestInit and returns a serialized json response that can be typed or not.
@@ -192,12 +201,26 @@ function makeService(
     }
   }
 
-  let api = {} as Record<Lowercase<HTTPMethod>, ReturnType<typeof service>>
+  const definedMethods = routes
+    ? Array.from(new Set(routes.map(({ method }) => method)))
+    : HTTP_METHODS
+
+  let api = {} as Record<string, unknown>
   for (const method of HTTP_METHODS) {
-    const lowerMethod = method.toLowerCase() as Lowercase<HTTPMethod>
-    api[lowerMethod] = service(method)
+    if (definedMethods.includes(method)) {
+      api[method.toLowerCase()] = service(method)
+    }
   }
-  return api
+  return api as typeof routes extends undefined
+    ? Record<Lowercase<HTTPMethod>, ReturnType<typeof service>>
+    : {
+        [K in T['method'] as Lowercase<T['method']>]: <
+          P extends Extract<T, { method: K }>['path'],
+        >(
+          path: P,
+          requestInit?: StrictReqInit<Extract<T, { method: K; path: P }>>,
+        ) => Promise<TypedResponse>
+      }
 }
 
 export {

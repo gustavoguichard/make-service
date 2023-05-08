@@ -1,4 +1,5 @@
-import { EnhancedRequestInit, Schema } from './types'
+import { HTTP_METHODS } from './constants'
+import { EnhancedRequestInit, HTTPMethod, Schema } from './types'
 
 /**
  * It returns the JSON object or throws an error if the response is not ok.
@@ -71,4 +72,8 @@ function typeOf(t: unknown) {
     | 'urlsearchparams'
 }
 
-export { getJson, getText, replaceUrlParams, typeOf }
+function isHTTPMethod(method: string | symbol): method is HTTPMethod {
+  return HTTP_METHODS.includes(method as HTTPMethod)
+}
+
+export { getJson, getText, isHTTPMethod, replaceUrlParams, typeOf }
