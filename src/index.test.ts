@@ -381,9 +381,9 @@ describe('makeService', () => {
       ])
       expect(typeof api.get).toBe('function')
       for (const method of HTTP_METHODS.filter((m) => m !== 'GET')) {
-        expect(
-          () => typeof api[method.toLocaleLowerCase() as keyof typeof api],
-        ).toThrowError(`Invalid HTTP method: ${method.toLowerCase()}`)
+        expect(typeof api[method.toLocaleLowerCase() as keyof typeof api]).toBe(
+          'undefined',
+        )
       }
     })
   })
@@ -480,3 +480,20 @@ describe('makeService', () => {
     )
   })
 })
+
+const api = subject.makeService('https://example.com/api', {}, [
+  {
+    method: 'GET',
+    path: '/users',
+    query: { role: ['admin', 'user'] },
+  },
+  { method: 'POST', path: '/users/:id' },
+])
+
+api.post('/users', { query: { role: 'admin' } })
+api.post('/users/:id', { params: { id: 'foo' } })
+
+// @ts-expect-error
+api.post('/users')
+// @ts-expect-error
+api.get('/users/:id', { params: { id: '1' } })

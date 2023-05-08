@@ -201,36 +201,26 @@ function makeService<const T extends Route>(
     }
   }
 
-  const methodsSet = routes
-    ? Array.from(new Set(routes.map((route) => route.method)))
+  const definedMethods = routes
+    ? Array.from(new Set(routes.map(({ method }) => method)))
     : HTTP_METHODS
 
-  /**
-   * It returns a proxy that returns the service function for each HTTP method
-   */
-  return new Proxy(
-    {} as typeof routes extends undefined
-      ? { [K in Lowercase<HTTPMethod>]: ReturnType<typeof service> }
-      : {
-          [K in T['method'] as Lowercase<T['method']>]: <
-            R extends Extract<T, { method: K }>,
-            P extends R['path'],
-          >(
-            path: P,
-            requestInit?: StrictReqInit<Extract<R, { method: K; path: P }>>,
-          ) => Promise<TypedResponse>
-        },
-    {
-      get(_target, prop) {
-        const method = String(prop).toUpperCase() as HTTPMethod
-        if (isHTTPMethod(method) && methodsSet.includes(method)) {
-          return service(method)
-        }
-
-        throw new Error(`Invalid HTTP method: ${prop.toString()}`)
-      },
-    },
-  )
+  let api = {} as Record<string, unknown>
+  for (const method of HTTP_METHODS) {
+    if (definedMethods.includes(method)) {
+      api[method.toLowerCase()] = service(method)
+    }
+  }
+  return api as typeof routes extends undefined
+    ? Record<Lowercase<HTTPMethod>, ReturnType<typeof service>>
+    : {
+        [K in T['method'] as Lowercase<T['method']>]: <
+          P extends Extract<T, { method: K }>['path'],
+        >(
+          path: P,
+          requestInit?: StrictReqInit<Extract<T, { method: K; path: P }>>,
+        ) => Promise<TypedResponse>
+      }
 }
 
 export {
