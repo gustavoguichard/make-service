@@ -62,10 +62,6 @@ function addQueryToUrl(
   }
   return url
 }
-/**
- * @deprecated method renamed to addQueryToUrl
- */
-const addQueryToInput = addQueryToUrl
 
 /**
  * @param baseURL the base path to the API
@@ -190,7 +186,6 @@ function makeService(baseURL: string | URL, baseHeaders?: HeadersInit) {
 }
 
 export {
-  addQueryToInput,
   addQueryToUrl,
   ensureStringBody,
   enhancedFetch,
