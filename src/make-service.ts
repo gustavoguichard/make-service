@@ -165,7 +165,7 @@ async function enhancedFetch(
  */
 function makeService(
   baseURL: string | URL,
-  baseHeaders?: HeadersInit | (() => HeadersInit),
+  baseHeaders?: HeadersInit | (() => HeadersInit | Promise<HeadersInit>),
 ) {
   /**
    * A function that receives a path and requestInit and returns a serialized json response that can be typed or not.
@@ -179,7 +179,9 @@ function makeService(
         ...requestInit,
         method,
         headers: mergeHeaders(
-          typeof baseHeaders === 'function' ? baseHeaders() : baseHeaders ?? {},
+          typeof baseHeaders === 'function'
+            ? await baseHeaders()
+            : baseHeaders ?? {},
           requestInit?.headers ?? {},
         ),
       })

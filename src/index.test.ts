@@ -408,6 +408,24 @@ describe('makeService', () => {
     })
   })
 
+  it('should accept an async function for dynamic headers', async () => {
+    vi.spyOn(global, 'fetch').mockImplementationOnce(
+      successfulFetch({ foo: 'bar' }),
+    )
+    const api = subject.makeService('https://example.com/api', async () => ({
+      Authorization: 'Bearer 123',
+    }))
+    await api.get('/users')
+    expect(reqMock).toHaveBeenCalledWith({
+      url: 'https://example.com/api/users',
+      headers: new Headers({
+        authorization: 'Bearer 123',
+        'content-type': 'application/json',
+      }),
+      method: 'GET',
+    })
+  })
+
   it('should accept a query, trace, and JSON-like body', async () => {
     const trace = vi.fn()
     vi.spyOn(global, 'fetch').mockImplementationOnce(
