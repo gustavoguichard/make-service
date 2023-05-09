@@ -39,8 +39,15 @@ const users = await response.json(usersSchema);
     - [Query](#query)
     - [Params](#params)
     - [Trace](#trace)
+  - [makeFetcher](#makefetcher)
   - [enhancedFetch](#enhancedfetch)
   - [typedResponse](#typedresponse)
+- [Other available primitives](#other-available-primitives)
+  - [addQueryToURL](#addquerytourl)
+  - [ensureStringBody](#ensurestringbody)
+  - [makeGetApiURL](#makegetapiurl)
+  - [mergeHeaders](#mergeheaders)
+  - [replaceURLParams](#replaceurlparams)
   - [Thank you](#thank-you)
 
 # Installation
@@ -121,6 +128,7 @@ const json = await response.json(
 const content = await response.text(z.string().email())
 // It will throw an error if the response.text is not a valid email
 ```
+You can transform any `Response` in a `TypedResponse` like that by using the [`typedResponse`](#typedresponse) function.
 
 ### Supported HTTP Verbs
 Other than the `get` it also accepts more HTTP verbs:
@@ -183,6 +191,7 @@ Note: Don't forget headers are case insensitive.
 const headers = new Headers({ 'Content-Type': 'application/json' })
 Object.fromEntries(headers) // equals to: { 'content-type': 'application/json' }
 ```
+All the features above are done by using the [`mergeHeaders`](#mergeheaders) function internally.
 
 
 ### Base URL
@@ -197,6 +206,7 @@ const response = await service.get("/users?admin=true")
 
 // It will call "https://example.com/api/users?admin=true"
 ```
+You can use the [`makeGetApiUrl`](#makegetapiurl) method to do that kind of URL composition.
 
 ### Body
 The function can also receive a `body` object that will be stringified and sent as the request body:
@@ -224,6 +234,7 @@ const response = await service.post("/users", {
   body: formData,
 })
 ```
+This is achieved by using the [`ensureStringBody`](#ensurestringbody) function internally.
 
 ### Query
 The service can also receive an `query` object that can be a `string`, a `URLSearchParams`, or an array of entries and it'll add that to the path as queryString:
@@ -248,6 +259,7 @@ const response = await service.get("/users?admin=true", {
   query: "page=2",
 })
 ```
+This is achieved by using the [`addQueryToURL`](#addquerytourl) function internally.
 
 ### Params
 The function can also receive a `params` object that will be used to replace the `:param` wildcards in the path:
@@ -262,6 +274,7 @@ const response = await service.get("/users/:id/article/:articleId", {
 
 // It will call "https://example.com/api/users/2/article/3"
 ```
+This is achieved by using the [`replaceURLParams`](#replaceurlparams) function internally.
 
 ### Trace
 The function can also receive a `trace` function that will be called with the final `url` and `requestInit` arguments.
@@ -285,6 +298,21 @@ const response = await service.get("/users/:id", {
 // "The request was sent to https://example.com/api/users/2?page=2"
 // with the following params: { headers: { "Accept": "application/json", "Content-type": "application/json" } }
 ```
+
+## makeFetcher
+This method is the same as [`makeService`](#make-service) but it doesn't expose the HTTP methods as properties of the returned object.
+This is good for when you want to have a service setup but don't know the methods you'll be calling in advance, like in a proxy.
+
+```ts
+import { makeFetcher } from 'make-service'
+
+const fetcher = makeFetcher("https://example.com/api")
+const response = await fetcher("/users", { method: "POST", body: { email: "john@doe.com" } })
+const json = await response.json()
+//    ^? unknown
+```
+
+Other than having to pass the method in the `RequestInit` this is going to have all the features of [`makeService`](#make-service).
 
 ## enhancedFetch
 
@@ -354,6 +382,125 @@ const text = await response.text<`foo${string}`>()
 //    ^? `foo${string}`
 const text = await response.text(z.string().email())
 //    ^? string
+```
+
+# Other available primitives
+This little library has plenty of other useful functions that you can use to build your own services and interactions with external APIs.
+
+## addQueryToURL
+It receives a URL instance or URL string and an object-like query and returns a new URL with the query appended to it.
+
+It will preserve the original query if it exists and will also preserve the type of the given URL.
+
+```ts
+import { addQueryToURL } from 'make-service'
+
+addQueryToURL("https://example.com/api/users", { page: "2" })
+// https://example.com/api/users?page=2
+
+addQueryToURL(
+  "https://example.com/api/users?role=admin",
+  { page: "2" },
+)
+// https://example.com/api/users?role=admin&page=2
+
+addQueryToURL(
+  new URL("https://example.com/api/users"),
+  { page: "2" },
+)
+// https://example.com/api/users?page=2
+
+addQueryToURL(
+  new URL("https://example.com/api/users?role=admin"),
+  { page: "2" },
+)
+// https://example.com/api/users?role=admin&page=2
+```
+
+## ensureStringBody
+It accepts any value considered a `BodyInit` (the type of the body in `fetch`, such as `ReadableStream` | `XMLHttpRequestBodyInit` | `null`) and also accepts a JSON-like structure such as a number, string, boolean, array or object.
+
+In case it detects a JSON-like structure it will return a stringified version of that payload. Otherwise the type will be preserved.
+
+```ts
+import { ensureStringBody } from 'make-service'
+
+ensureStringBody({ foo: "bar" })
+// '{"foo":"bar"}'
+ensureStringBody("foo")
+// 'foo'
+ensureStringBody(1)
+// '1'
+ensureStringBody(true)
+// 'true'
+ensureStringBody(null)
+// null
+ensureStringBody(new ReadableStream())
+// ReadableStream
+
+// and so on...
+```
+
+## makeGetApiURL
+It creates an URL builder for your API. It works similarly to [`makeFetcher`](#makefetcher) but will return the URL instead of a response.
+
+You create a `getApiURL` function by giving it a `baseURL` and then it accepts a path and an optional [query](#query) that will be merged into the final URL.
+
+```ts
+import { makeGetApiURL } from 'make-service'
+
+const getApiURL = makeGetApiURL("https://example.com/api")
+const url = getApiURL("/users?admin=true", { query: { page: "2" } })
+
+// "https://example.com/api/users?admin=true&page=2"
+```
+
+Notice the extra slashes are gonna be added or removed as needed.
+```ts
+makeGetApiURL("https://example.com/api/")("/users")
+// "https://example.com/api/users"
+makeGetApiURL("https://example.com/api")("users")
+// "https://example.com/api/users"
+```
+
+## mergeHeaders
+It merges multiple `HeadersInit` objects into a single `Headers` instance.
+They can be of any type that is accepted by the `Headers` constructor, like a `Headers` instance, a plain object, or an array of entries.
+
+```ts
+import { mergeHeaders } from 'make-service'
+
+const headers1 = new Headers({ "Content-Type": "application/json" })
+const headers2 = { Accept: "application/json" }
+const headers3 = [["accept", "*/*"]]
+
+const merged = mergeHeaders(headers1, headers2, headers3)
+//    ^? Headers({ "content-Type": "application/json", "accept": "*/*" })
+```
+
+It will delete previous headers if `undefined` or `"undefined"` is given:
+
+```ts
+import { mergeHeaders } from 'make-service'
+
+const headers1 = new Headers({ "Content-Type": "application/json", Accept: "application/json" })
+const headers2 = { accept: undefined }
+const headers3 = [["content-type", "undefined"]]
+
+const merged = mergeHeaders(headers1, headers2, headers3)
+//    ^? Headers({})
+```
+
+## replaceURLParams
+This function replaces URL wildcards with the given params.
+```ts
+import { replaceURLParams } from 'make-service'
+
+const url = replaceURLParams(
+  "https://example.com/users/:id/posts/:postId",
+  { id: "2", postId: "3" },
+)
+// It will return: "https://example.com/users/2/posts/3"
 ```
 
 ## Thank you
