@@ -157,6 +157,36 @@ async function enhancedFetch(
 
 /**
  *
+ * @param baseURL the base URL to be fetched in every request
+ * @param baseHeaders any headers that should be sent with every request
+ * @returns a function that receive a path and requestInit and return a serialized json response that can be typed or not.
+ * @example const headers = { Authorization: "Bearer 123" }
+ * const fetcher = makeFetcher("https://example.com/api", headers);
+ * const response = await fetcher("/users", { method: "GET" })
+ * const users = await response.json(userSchema);
+ * //    ^? User[]
+ */
+function makeFetcher(
+  baseURL: string | URL,
+  baseHeaders?: HeadersInit | (() => HeadersInit | Promise<HeadersInit>),
+) {
+  return async (path: string, requestInit: EnhancedRequestInit = {}) => {
+    const url = makeGetApiURL(baseURL)(path)
+    const response = await enhancedFetch(url, {
+      ...requestInit,
+      headers: mergeHeaders(
+        typeof baseHeaders === 'function'
+          ? await baseHeaders()
+          : baseHeaders ?? {},
+        requestInit?.headers ?? {},
+      ),
+    })
+    return response
+  }
+}
+
+/**
+ *
  * @param baseURL the base URL to the API
  * @param baseHeaders any headers that should be sent with every request
  * @returns a service object with HTTP methods that are functions that receive a path and requestInit and return a serialized json response that can be typed or not.
@@ -170,21 +200,11 @@ function makeService(
   baseURL: string | URL,
   baseHeaders?: HeadersInit | (() => HeadersInit | Promise<HeadersInit>),
 ) {
+  const fetcher = makeFetcher(baseURL, baseHeaders)
+
   function appliedService(method: HTTPMethod) {
-    return async (path: string, requestInit: ServiceRequestInit = {}) => {
-      const url = makeGetApiURL(baseURL)(path)
-      const response = await enhancedFetch(url, {
-        ...requestInit,
-        method,
-        headers: mergeHeaders(
-          typeof baseHeaders === 'function'
-            ? await baseHeaders()
-            : baseHeaders ?? {},
-          requestInit?.headers ?? {},
-        ),
-      })
-      return response
-    }
+    return async (path: string, requestInit: ServiceRequestInit = {}) =>
+      fetcher(path, { ...requestInit, method })
   }
 
   let service = {} as Record<
@@ -202,6 +222,7 @@ export {
   addQueryToURL,
   enhancedFetch,
   ensureStringBody,
+  makeFetcher,
   makeGetApiURL,
   makeService,
   mergeHeaders,
