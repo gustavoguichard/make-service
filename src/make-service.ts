@@ -1,5 +1,5 @@
 import { HTTP_METHODS } from './constants'
-import { getJson, getText, replaceUrlParams, typeOf } from './internals'
+import { getJson, getText, replaceURLParams, typeOf } from './internals'
 import {
   EnhancedRequestInit,
   HTTPMethod,
@@ -43,7 +43,7 @@ function mergeHeaders(
  * @param searchParams the query parameters
  * @returns the url with the query parameters added with the same type as the url
  */
-function addQueryToUrl(
+function addQueryToURL(
   url: string | URL,
   searchParams?: SearchParams,
 ): string | URL {
@@ -67,11 +67,11 @@ function addQueryToUrl(
  * @param baseURL the base path to the API
  * @returns a function that receives a path and an object of query parameters and returns a URL
  */
-function makeGetApiUrl(baseURL: string | URL) {
+function makeGetApiURL(baseURL: string | URL) {
   const base = baseURL instanceof URL ? baseURL.toString() : baseURL
   return (path: string, searchParams?: SearchParams): string | URL => {
     const url = `${base}${path}`.replace(/([^https?:]\/)\/+/g, '$1')
-    return addQueryToUrl(url, searchParams)
+    return addQueryToURL(url, searchParams)
   }
 }
 
@@ -144,13 +144,13 @@ async function enhancedFetch(
     },
     reqInit.headers ?? {},
   )
-  const withParams = replaceUrlParams(url, reqInit.params ?? {})
-  const fullUrl = addQueryToUrl(withParams, query)
+  const withParams = replaceURLParams(url, reqInit.params ?? {})
+  const fullURL = addQueryToURL(withParams, query)
   const body = ensureStringBody(reqInit.body)
 
   const enhancedReqInit = { ...reqInit, headers, body }
-  trace?.(fullUrl, enhancedReqInit)
-  const response = await fetch(fullUrl, enhancedReqInit)
+  trace?.(fullURL, enhancedReqInit)
+  const response = await fetch(fullURL, enhancedReqInit)
 
   return typedResponse(response)
 }
@@ -170,14 +170,9 @@ function makeService(
   baseURL: string | URL,
   baseHeaders?: HeadersInit | (() => HeadersInit | Promise<HeadersInit>),
 ) {
-  /**
-   * A function that receives a path and requestInit and returns a serialized json response that can be typed or not.
-   * @param method the HTTP method
-   * @returns the service function for the given HTTP method
-   */
-  const service = (method: HTTPMethod) => {
+  function appliedService(method: HTTPMethod) {
     return async (path: string, requestInit: ServiceRequestInit = {}) => {
-      const url = makeGetApiUrl(baseURL)(path)
+      const url = makeGetApiURL(baseURL)(path)
       const response = await enhancedFetch(url, {
         ...requestInit,
         method,
@@ -192,20 +187,23 @@ function makeService(
     }
   }
 
-  let api = {} as Record<Lowercase<HTTPMethod>, ReturnType<typeof service>>
+  let service = {} as Record<
+    Lowercase<HTTPMethod>,
+    ReturnType<typeof appliedService>
+  >
   for (const method of HTTP_METHODS) {
     const lowerMethod = method.toLowerCase() as Lowercase<HTTPMethod>
-    api[lowerMethod] = service(method)
+    service[lowerMethod] = appliedService(method)
   }
-  return api
+  return service
 }
 
 export {
-  addQueryToUrl,
-  ensureStringBody,
+  addQueryToURL,
   enhancedFetch,
+  ensureStringBody,
+  makeGetApiURL,
   makeService,
-  makeGetApiUrl,
   mergeHeaders,
   typedResponse,
 }

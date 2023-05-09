@@ -39,36 +39,36 @@ describe('mergeHeaders', () => {
   })
 })
 
-describe('addQueryToUrl', () => {
+describe('addQueryToURL', () => {
   it('should add the query object to a string input', () => {
-    expect(subject.addQueryToUrl('https://example.com/api', { id: '1' })).toBe(
+    expect(subject.addQueryToURL('https://example.com/api', { id: '1' })).toBe(
       'https://example.com/api?id=1',
     )
     expect(
-      subject.addQueryToUrl('https://example.com/api', 'page=2&foo=bar'),
+      subject.addQueryToURL('https://example.com/api', 'page=2&foo=bar'),
     ).toBe('https://example.com/api?page=2&foo=bar')
   })
 
   it('should add the query object to a URL input', () => {
     expect(
-      subject.addQueryToUrl(new URL('https://example.com/api'), {
+      subject.addQueryToURL(new URL('https://example.com/api'), {
         id: '1',
       }),
     ).toEqual(new URL('https://example.com/api?id=1'))
     expect(
-      subject.addQueryToUrl(new URL('https://example.com/api'), 'page=2'),
+      subject.addQueryToURL(new URL('https://example.com/api'), 'page=2'),
     ).toEqual(new URL('https://example.com/api?page=2'))
   })
 
   it('should append the query to a URL string that already has QS', () => {
     expect(
-      subject.addQueryToUrl('https://example.com/api?id=1', { page: '2' }),
+      subject.addQueryToURL('https://example.com/api?id=1', { page: '2' }),
     ).toBe('https://example.com/api?id=1&page=2')
     expect(
-      subject.addQueryToUrl('https://example.com/api?id=1', 'page=2'),
+      subject.addQueryToURL('https://example.com/api?id=1', 'page=2'),
     ).toBe('https://example.com/api?id=1&page=2')
     expect(
-      subject.addQueryToUrl(
+      subject.addQueryToURL(
         'https://example.com/api?id=1',
         new URLSearchParams({ page: '2' }),
       ),
@@ -77,15 +77,15 @@ describe('addQueryToUrl', () => {
 
   it('should append the query to a URL instance that already has QS', () => {
     expect(
-      subject.addQueryToUrl(new URL('https://example.com/api?id=1'), {
+      subject.addQueryToURL(new URL('https://example.com/api?id=1'), {
         page: '2',
       }),
     ).toEqual(new URL('https://example.com/api?id=1&page=2'))
     expect(
-      subject.addQueryToUrl(new URL('https://example.com/api?id=1'), 'page=2'),
+      subject.addQueryToURL(new URL('https://example.com/api?id=1'), 'page=2'),
     ).toEqual(new URL('https://example.com/api?id=1&page=2'))
     expect(
-      subject.addQueryToUrl(
+      subject.addQueryToURL(
         new URL('https://example.com/api?id=1'),
         new URLSearchParams({ page: '2' }),
       ),
@@ -93,24 +93,24 @@ describe('addQueryToUrl', () => {
   })
 
   it("should return the input in case there's no query", () => {
-    expect(subject.addQueryToUrl('https://example.com/api')).toBe(
+    expect(subject.addQueryToURL('https://example.com/api')).toBe(
       'https://example.com/api',
     )
-    expect(subject.addQueryToUrl(new URL('https://example.com/api'))).toEqual(
+    expect(subject.addQueryToURL(new URL('https://example.com/api'))).toEqual(
       new URL('https://example.com/api'),
     )
   })
 })
 
-describe('makeGetApiUrl', () => {
+describe('makeGetApiURL', () => {
   it('should return a URL which is baseURL and path joined', () => {
-    expect(subject.makeGetApiUrl('https://example.com/api')('/users')).toBe(
+    expect(subject.makeGetApiURL('https://example.com/api')('/users')).toBe(
       'https://example.com/api/users',
     )
   })
 
   it('should accept an object-like queryString and return it joined to the URL', () => {
-    const getApiURL = subject.makeGetApiUrl('https://example.com/api')
+    const getApiURL = subject.makeGetApiURL('https://example.com/api')
     expect(getApiURL('/users', { id: '1' })).toBe(
       'https://example.com/api/users?id=1',
     )
@@ -121,13 +121,13 @@ describe('makeGetApiUrl', () => {
 
   it('should accept a URL as baseURL and remove extra slashes', () => {
     expect(
-      subject.makeGetApiUrl(new URL('https://example.com/api'))('/users'),
+      subject.makeGetApiURL(new URL('https://example.com/api'))('/users'),
     ).toBe('https://example.com/api/users')
     expect(
-      subject.makeGetApiUrl(new URL('https://example.com/api/'))('/users'),
+      subject.makeGetApiURL(new URL('https://example.com/api/'))('/users'),
     ).toBe('https://example.com/api/users')
     expect(
-      subject.makeGetApiUrl(new URL('https://example.com/api/'))('///users'),
+      subject.makeGetApiURL(new URL('https://example.com/api/'))('///users'),
     ).toBe('https://example.com/api/users')
   })
 })
