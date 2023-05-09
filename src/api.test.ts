@@ -1,6 +1,7 @@
 import { HTTP_METHODS } from './constants'
-import * as subject from './index'
+import * as subject from './api'
 import * as z from 'zod'
+import { HTTPMethod } from './types'
 
 export type Expect<T extends true> = T
 export type Equal<A, B> =
@@ -8,167 +9,6 @@ export type Equal<A, B> =
   (<T>() => T extends A ? 1 : 2) extends (<T>() => T extends B ? 1 : 2)
     ? true
     : false
-
-beforeEach(() => {
-  vi.clearAllMocks()
-})
-
-describe('mergeHeaders', () => {
-  it('should merge diferent kinds of Headers', () => {
-    expect(
-      subject.mergeHeaders(new Headers({ a: '1' }), { b: '2' }, [['c', '3']]),
-    ).toEqual(new Headers({ a: '1', b: '2', c: '3' }))
-  })
-
-  it('should merge diferent kinds of Headers and override values', () => {
-    expect(
-      subject.mergeHeaders(new Headers({ a: '1' }), { a: '2' }, [['a', '3']]),
-    ).toEqual(new Headers({ a: '3' }))
-  })
-
-  it('should merge diferent kinds of Headers and delete undefined values', () => {
-    expect(
-      subject.mergeHeaders(new Headers({ a: '1' }), { a: undefined }),
-    ).toEqual(new Headers({}))
-    expect(
-      subject.mergeHeaders(new Headers({ a: '1' }), { a: 'undefined' }),
-    ).toEqual(new Headers({}))
-    expect(
-      subject.mergeHeaders(new Headers({ a: '1' }), [['a', undefined]]),
-    ).toEqual(new Headers({}))
-  })
-})
-
-describe('addQueryToUrl', () => {
-  it('should add the query object to a string input', () => {
-    expect(subject.addQueryToUrl('https://example.com/api', { id: '1' })).toBe(
-      'https://example.com/api?id=1',
-    )
-    expect(
-      subject.addQueryToUrl('https://example.com/api', 'page=2&foo=bar'),
-    ).toBe('https://example.com/api?page=2&foo=bar')
-  })
-
-  it('should add the query object to a URL input', () => {
-    expect(
-      subject.addQueryToUrl(new URL('https://example.com/api'), {
-        id: '1',
-      }),
-    ).toEqual(new URL('https://example.com/api?id=1'))
-    expect(
-      subject.addQueryToUrl(new URL('https://example.com/api'), 'page=2'),
-    ).toEqual(new URL('https://example.com/api?page=2'))
-  })
-
-  it('should append the query to a URL string that already has QS', () => {
-    expect(
-      subject.addQueryToUrl('https://example.com/api?id=1', { page: '2' }),
-    ).toBe('https://example.com/api?id=1&page=2')
-    expect(
-      subject.addQueryToUrl('https://example.com/api?id=1', 'page=2'),
-    ).toBe('https://example.com/api?id=1&page=2')
-    expect(
-      subject.addQueryToUrl(
-        'https://example.com/api?id=1',
-        new URLSearchParams({ page: '2' }),
-      ),
-    ).toBe('https://example.com/api?id=1&page=2')
-  })
-
-  it('should append the query to a URL instance that already has QS', () => {
-    expect(
-      subject.addQueryToUrl(new URL('https://example.com/api?id=1'), {
-        page: '2',
-      }),
-    ).toEqual(new URL('https://example.com/api?id=1&page=2'))
-    expect(
-      subject.addQueryToUrl(new URL('https://example.com/api?id=1'), 'page=2'),
-    ).toEqual(new URL('https://example.com/api?id=1&page=2'))
-    expect(
-      subject.addQueryToUrl(
-        new URL('https://example.com/api?id=1'),
-        new URLSearchParams({ page: '2' }),
-      ),
-    ).toEqual(new URL('https://example.com/api?id=1&page=2'))
-  })
-
-  it("should return the input in case there's no query", () => {
-    expect(subject.addQueryToUrl('https://example.com/api')).toBe(
-      'https://example.com/api',
-    )
-    expect(subject.addQueryToUrl(new URL('https://example.com/api'))).toEqual(
-      new URL('https://example.com/api'),
-    )
-  })
-})
-
-describe('makeGetApiUrl', () => {
-  it('should return a URL which is baseURL and path joined', () => {
-    expect(subject.makeGetApiUrl('https://example.com/api')('/users')).toBe(
-      'https://example.com/api/users',
-    )
-  })
-
-  it('should accept an object-like queryString and return it joined to the URL', () => {
-    const getApiURL = subject.makeGetApiUrl('https://example.com/api')
-    expect(getApiURL('/users', { id: '1' })).toBe(
-      'https://example.com/api/users?id=1',
-    )
-    expect(getApiURL('/users', { active: 'true', page: '2' })).toBe(
-      'https://example.com/api/users?active=true&page=2',
-    )
-  })
-
-  it('should accept a URL as baseURL and remove extra slashes', () => {
-    expect(
-      subject.makeGetApiUrl(new URL('https://example.com/api'))('/users'),
-    ).toBe('https://example.com/api/users')
-    expect(
-      subject.makeGetApiUrl(new URL('https://example.com/api/'))('/users'),
-    ).toBe('https://example.com/api/users')
-    expect(
-      subject.makeGetApiUrl(new URL('https://example.com/api/'))('///users'),
-    ).toBe('https://example.com/api/users')
-  })
-})
-
-describe('typedResponse', () => {
-  it('should return unknown by default when turning into a JSON', async () => {
-    const result = await subject.typedResponse(new Response('1')).json()
-    type _R = Expect<Equal<typeof result, unknown>>
-    expect(result).toEqual(1)
-  })
-
-  it('should accept a type for the JSON method', async () => {
-    const result = await subject
-      .typedResponse(new Response(`{"foo":"bar"}`))
-      .json<{ foo: string }>()
-    type _R = Expect<Equal<typeof result, { foo: string }>>
-    expect(result).toEqual({ foo: 'bar' })
-  })
-
-  it('should accept a parser for the JSON method', async () => {
-    const result = await subject
-      .typedResponse(new Response(`{"foo":"bar"}`))
-      .json(z.object({ foo: z.string() }))
-    type _R = Expect<Equal<typeof result, { foo: string }>>
-    expect(result).toEqual({ foo: 'bar' })
-  })
-})
-
-describe('ensureStringBody', () => {
-  it('should return the same if body was string', () => {
-    expect(subject.ensureStringBody('foo')).toBe('foo')
-  })
-
-  it('should return the same if body was not defined', () => {
-    expect(subject.ensureStringBody()).toBe(undefined)
-  })
-
-  it('should stringify the body if it is a JSON-like value', () => {
-    expect(subject.ensureStringBody({ page: 2 })).toBe(`{"page":2}`)
-  })
-})
 
 const reqMock = vi.fn()
 function successfulFetch(response: string | Record<string, unknown>) {
@@ -184,6 +24,10 @@ function successfulFetch(response: string | Record<string, unknown>) {
     )
   }
 }
+
+beforeEach(() => {
+  vi.clearAllMocks()
+})
 
 describe('enhancedFetch', () => {
   describe('proxied json', () => {
@@ -345,48 +189,75 @@ describe('enhancedFetch', () => {
   })
 })
 
-describe('makeService', () => {
-  it('should return an object with http methods', () => {
-    const api = subject.makeService('https://example.com/api')
-    for (const method of HTTP_METHODS) {
-      expect(
-        typeof api[method.toLocaleLowerCase() as Lowercase<subject.HTTPMethod>],
-      ).toBe('function')
-    }
-  })
-
-  it('should return an API with enhancedFetch', async () => {
+describe('makeFetcher', () => {
+  it('should return a applied enhancedFetch', async () => {
     vi.spyOn(global, 'fetch').mockImplementationOnce(
       successfulFetch({ foo: 'bar' }),
     )
-    const api = subject.makeService('https://example.com/api')
-    const result = await api
-      .post('/users')
-      .then((r) => r.json(z.object({ foo: z.string() })))
+    const service = subject.makeFetcher('https://example.com/api')
+    const result = await service('/users', { method: 'post' }).then((r) =>
+      r.json(z.object({ foo: z.string() })),
+    )
     type _R = Expect<Equal<typeof result, { foo: string }>>
     expect(result).toEqual({ foo: 'bar' })
     expect(reqMock).toHaveBeenCalledWith({
       url: 'https://example.com/api/users',
       headers: new Headers({ 'content-type': 'application/json' }),
-      method: 'POST',
+      method: 'post',
     })
   })
 
-  it('should add headers and method to the request', async () => {
+  it('should add headers to the request', async () => {
     vi.spyOn(global, 'fetch').mockImplementationOnce(
       successfulFetch({ foo: 'bar' }),
     )
-    const api = subject.makeService('https://example.com/api', {
+    const service = subject.makeFetcher('https://example.com/api', {
       Authorization: 'Bearer 123',
     })
-    await api.get('/users')
+    await service('/users')
     expect(reqMock).toHaveBeenCalledWith({
       url: 'https://example.com/api/users',
       headers: new Headers({
         authorization: 'Bearer 123',
         'content-type': 'application/json',
       }),
-      method: 'GET',
+    })
+  })
+
+  it('should accept a function for dynamic headers', async () => {
+    vi.spyOn(global, 'fetch').mockImplementationOnce(
+      successfulFetch({ foo: 'bar' }),
+    )
+    const service = subject.makeFetcher('https://example.com/api', () => ({
+      Authorization: 'Bearer 123',
+    }))
+    await service('/users')
+    expect(reqMock).toHaveBeenCalledWith({
+      url: 'https://example.com/api/users',
+      headers: new Headers({
+        authorization: 'Bearer 123',
+        'content-type': 'application/json',
+      }),
+    })
+  })
+
+  it('should accept an async function for dynamic headers', async () => {
+    vi.spyOn(global, 'fetch').mockImplementationOnce(
+      successfulFetch({ foo: 'bar' }),
+    )
+    const service = subject.makeFetcher(
+      'https://example.com/api',
+      async () => ({
+        Authorization: 'Bearer 123',
+      }),
+    )
+    await service('/users')
+    expect(reqMock).toHaveBeenCalledWith({
+      url: 'https://example.com/api/users',
+      headers: new Headers({
+        authorization: 'Bearer 123',
+        'content-type': 'application/json',
+      }),
     })
   })
 
@@ -395,8 +266,9 @@ describe('makeService', () => {
     vi.spyOn(global, 'fetch').mockImplementationOnce(
       successfulFetch({ foo: 'bar' }),
     )
-    const api = subject.makeService('https://example.com/api')
-    await api.post('/users', {
+    const service = subject.makeFetcher('https://example.com/api')
+    await service('/users', {
+      method: 'POST',
       body: { id: 1, name: { first: 'John', last: 'Doe' } },
       query: { admin: 'true' },
       trace,
@@ -409,5 +281,57 @@ describe('makeService', () => {
         body: `{"id":1,"name":{"first":"John","last":"Doe"}}`,
       },
     )
+  })
+})
+
+describe('makeService', () => {
+  it('should return an object with http methods', () => {
+    const service = subject.makeService('https://example.com/api')
+    for (const method of HTTP_METHODS) {
+      expect(
+        typeof service[method.toLocaleLowerCase() as Lowercase<HTTPMethod>],
+      ).toBe('function')
+    }
+  })
+
+  it('should return an API with enhancedFetch', async () => {
+    vi.spyOn(global, 'fetch').mockImplementationOnce(
+      successfulFetch({ foo: 'bar' }),
+    )
+    const service = subject.makeService('https://example.com/api')
+    const result = await service
+      .post('/users')
+      .then((r) => r.json(z.object({ foo: z.string() })))
+    type _R = Expect<Equal<typeof result, { foo: string }>>
+    expect(result).toEqual({ foo: 'bar' })
+    expect(reqMock).toHaveBeenCalledWith({
+      url: 'https://example.com/api/users',
+      headers: new Headers({ 'content-type': 'application/json' }),
+      method: 'POST',
+    })
+  })
+})
+
+describe('typedResponse', () => {
+  it('should return unknown by default when turning into a JSON', async () => {
+    const result = await subject.typedResponse(new Response('1')).json()
+    type _R = Expect<Equal<typeof result, unknown>>
+    expect(result).toEqual(1)
+  })
+
+  it('should accept a type for the JSON method', async () => {
+    const result = await subject
+      .typedResponse(new Response(`{"foo":"bar"}`))
+      .json<{ foo: string }>()
+    type _R = Expect<Equal<typeof result, { foo: string }>>
+    expect(result).toEqual({ foo: 'bar' })
+  })
+
+  it('should accept a parser for the JSON method', async () => {
+    const result = await subject
+      .typedResponse(new Response(`{"foo":"bar"}`))
+      .json(z.object({ foo: z.string() }))
+    type _R = Expect<Equal<typeof result, { foo: string }>>
+    expect(result).toEqual({ foo: 'bar' })
   })
 })

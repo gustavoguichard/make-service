@@ -1,5 +1,4 @@
-import { HTTP_METHODS } from './constants'
-import { HTTPMethod, EnhancedRequestInit, Schema } from './types'
+import { EnhancedRequestInit, Schema } from './types'
 
 /**
  * It returns the JSON object or throws an error if the response is not ok.
@@ -8,9 +7,6 @@ import { HTTPMethod, EnhancedRequestInit, Schema } from './types'
  */
 function getJson(response: Response) {
   return async <T = unknown>(schema?: Schema<T>): Promise<T> => {
-    if (!response.ok) {
-      throw new Error(await response.text())
-    }
     const json = await response.json()
     return schema ? schema.parse(json) : (json as T)
   }
@@ -27,28 +23,32 @@ function getText(response: Response) {
   }
 }
 
-function isHTTPMethod(method: string | symbol): method is HTTPMethod {
-  return HTTP_METHODS.includes(method as HTTPMethod)
-}
-
 /**
- *
- * @param url the url string or URL object to replace the params
- * @param params the params map to be replaced in the url
- * @returns the url with the params replaced and with the same type as the given url
+ * This is an enhanced version of the typeof operator to check the type of more complex values.
+ * @param t the value to be checked
+ * @returns the type of the value
  */
-function replaceUrlParams(
-  url: string | URL,
-  params: EnhancedRequestInit['params'],
-) {
-  // TODO: use the URL Pattern API as soon as it has better browser support
-  if (!params) return url
-
-  let urlString = String(url)
-  Object.entries(params).forEach(([key, value]) => {
-    urlString = urlString.replace(new RegExp(`:${key}($|\/)`), `${value}$1`)
-  })
-  return url instanceof URL ? new URL(urlString) : urlString
+function typeOf(t: unknown) {
+  return Object.prototype.toString
+    .call(t)
+    .replace(/^\[object (.+)\]$/, '$1')
+    .toLowerCase() as
+    | 'array'
+    | 'arraybuffer'
+    | 'bigint'
+    | 'blob'
+    | 'boolean'
+    | 'formdata'
+    | 'function'
+    | 'null'
+    | 'number'
+    | 'object'
+    | 'readablestream'
+    | 'string'
+    | 'symbol'
+    | 'undefined'
+    | 'url'
+    | 'urlsearchparams'
 }
 
-export { getJson, getText, isHTTPMethod, replaceUrlParams }
+export { getJson, getText, typeOf }

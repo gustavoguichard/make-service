@@ -17,8 +17,9 @@ type TypedResponse = Omit<Response, 'json' | 'text'> & {
   text: TypedResponseText
 }
 
-type EnhancedRequestInit = Omit<RequestInit, 'body'> & {
-  body?: JSONValue
+type EnhancedRequestInit = Omit<RequestInit, 'body' | 'method'> & {
+  method?: HTTPMethod | Lowercase<HTTPMethod>
+  body?: JSONValue | BodyInit | null
   query?: SearchParams
   params?: Record<string, string>
   trace?: (...args: Parameters<typeof fetch>) => void
