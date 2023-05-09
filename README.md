@@ -506,8 +506,8 @@ const url = replaceURLParams(
 # Acknowledgements
 This library is part of a code I've been carrying around for a while through many projects.
 
-- [croods](https://github.com/seasonedcc/croods) by [@danielweinmann](https://github.com/danielweinmann) - a react data-layer library from pre-ReactQuery/pre-SWR era - gave me ideas and experiences dealing with APIs after spending a lot of time in that codebase.
+- [croods](https://github.com/seasonedcc/croods) by [@danielweinmann](https://github.com/danielweinmann) - a react data-layer library from pre-ReactQuery/pre-SWR era - gave me ideas and experience dealing with APIs after spending a lot of time in that codebase.
 - [zod](https://zod.dev/) by [@colinhacks](https://github.com/colinhacks) changed my mindset about how to deal with external data.
-- [zod-fetch](https://github.com/mattpocock/zod-fetch) by [@mattpocock](https://github.com/mattpocock) for the inspiration, when I realized I a similar solution that could be extracted and be available for everyone to use.
+- [zod-fetch](https://github.com/mattpocock/zod-fetch) by [@mattpocock](https://github.com/mattpocock) for the inspiration, when I realized I had a similar solution that could be extracted and be available for everyone to use.
 
 I really appreciate your feedback and contributions. If you have any questions, feel free to open an issue or contact me on [Twitter](https://twitter.com/gugaguichard).
