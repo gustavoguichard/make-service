@@ -1,12 +1,9 @@
+export { enhancedFetch, makeFetcher, makeService, typedResponse } from './api'
 export {
   addQueryToURL,
-  enhancedFetch,
   ensureStringBody,
-  makeFetcher,
   makeGetApiURL,
-  makeService,
   mergeHeaders,
   replaceURLParams,
-  typedResponse,
-} from './make-service'
+} from './primitives'
 export type * from './types'
