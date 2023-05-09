@@ -48,7 +48,7 @@ const users = await response.json(usersSchema);
   - [makeGetApiURL](#makegetapiurl)
   - [mergeHeaders](#mergeheaders)
   - [replaceURLParams](#replaceurlparams)
-  - [Thank you](#thank-you)
+- [Acknowledgements](#acknowledgements)
 
 # Installation
 
