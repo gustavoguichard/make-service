@@ -1,5 +1,5 @@
 import { HTTP_METHODS } from './constants'
-import { getJson, getText, replaceURLParams, typeOf } from './internals'
+import { getJson, getText, typeOf } from './internals'
 import {
   EnhancedRequestInit,
   HTTPMethod,
@@ -61,6 +61,26 @@ function addQueryToURL(
     }
   }
   return url
+}
+
+/**
+ *
+ * @param url the url string or URL object to replace the params
+ * @param params the params map to be replaced in the url
+ * @returns the url with the params replaced and with the same type as the given url
+ */
+function replaceURLParams<T extends string | URL>(
+  url: string | URL,
+  params: EnhancedRequestInit['params'],
+): T {
+  // TODO: use the URL Pattern API as soon as it has better browser support
+  if (!params) return url as T
+
+  let urlString = String(url)
+  Object.entries(params).forEach(([key, value]) => {
+    urlString = urlString.replace(new RegExp(`:${key}($|\/)`), `${value}$1`)
+  })
+  return (url instanceof URL ? new URL(urlString) : urlString) as T
 }
 
 /**
@@ -226,5 +246,6 @@ export {
   makeGetApiURL,
   makeService,
   mergeHeaders,
+  replaceURLParams,
   typedResponse,
 }
