@@ -1,9 +1,9 @@
 export {
-  addQueryToUrl,
-  ensureStringBody,
+  addQueryToURL,
   enhancedFetch,
+  ensureStringBody,
+  makeGetApiURL,
   makeService,
-  makeGetApiUrl,
   mergeHeaders,
   typedResponse,
 } from './make-service'

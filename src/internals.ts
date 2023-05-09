@@ -29,7 +29,7 @@ function getText(response: Response) {
  * @param params the params map to be replaced in the url
  * @returns the url with the params replaced and with the same type as the given url
  */
-function replaceUrlParams(
+function replaceURLParams(
   url: string | URL,
   params: EnhancedRequestInit['params'],
 ) {
@@ -71,4 +71,4 @@ function typeOf(t: unknown) {
     | 'urlsearchparams'
 }
 
-export { getJson, getText, replaceUrlParams, typeOf }
+export { getJson, getText, replaceURLParams, typeOf }
