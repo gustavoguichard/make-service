@@ -24,26 +24,6 @@ function getText(response: Response) {
 }
 
 /**
- *
- * @param url the url string or URL object to replace the params
- * @param params the params map to be replaced in the url
- * @returns the url with the params replaced and with the same type as the given url
- */
-function replaceURLParams(
-  url: string | URL,
-  params: EnhancedRequestInit['params'],
-) {
-  // TODO: use the URL Pattern API as soon as it has better browser support
-  if (!params) return url
-
-  let urlString = String(url)
-  Object.entries(params).forEach(([key, value]) => {
-    urlString = urlString.replace(new RegExp(`:${key}($|\/)`), `${value}$1`)
-  })
-  return url instanceof URL ? new URL(urlString) : urlString
-}
-
-/**
  * This is an enhanced version of the typeof operator to check the type of more complex values.
  * @param t the value to be checked
  * @returns the type of the value
@@ -71,4 +51,4 @@ function typeOf(t: unknown) {
     | 'urlsearchparams'
 }
 
-export { getJson, getText, replaceURLParams, typeOf }
+export { getJson, getText, typeOf }

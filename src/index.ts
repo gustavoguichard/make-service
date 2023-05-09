@@ -6,6 +6,7 @@ export {
   makeGetApiURL,
   makeService,
   mergeHeaders,
+  replaceURLParams,
   typedResponse,
 } from './make-service'
 export type * from './types'
