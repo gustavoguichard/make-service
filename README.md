@@ -8,7 +8,7 @@ It adds a set of little features and allows you to parse responses with [zod](ht
 - 🤩 Type-safe return of `response.json()` and `response.text()`. Defaults to `unknown` instead of `any`.
 - 🚦 Easily setup an API with a `baseURL` and common `headers` for every request.
 - 🏗️ Compose URL from the base by just calling the endpoints and an object-like `query`.
-- 🐾 Replaces URL wildcards with an object of `params`.
+- 🐾 Replaces URL wildcards with a **strongly-typed** object of `params`.
 - 🧙‍♀️ Automatically stringifies the `body` of a request so you can give it a JSON-like structure.
 - 🐛 Accepts a `trace` function for debugging.
 
@@ -274,6 +274,12 @@ const response = await service.get("/users/:id/article/:articleId", {
 
 // It will call "https://example.com/api/users/2/article/3"
 ```
+The `params` object will not type-check if the given object doesn't follow the path structure.
+```ts
+// @ts-expect-error
+service.get("/users/:id", { params: { id: "2", foobar: "foo" } })
+```
+
 This is achieved by using the [`replaceURLParams`](#replaceurlparams) function internally.
 
 ### Trace
@@ -502,6 +508,8 @@ const url = replaceURLParams(
 )
 // It will return: "https://example.com/users/2/posts/3"
 ```
+
+The params will be **strongly-typed** which means they will be validated against the URL structure and will not type-check if the given object does not match that structure.
 
 # Acknowledgements
 This library is part of a code I've been carrying around for a while through many projects.
