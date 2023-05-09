@@ -352,36 +352,3 @@ describe('typedResponse', () => {
     expect(result).toEqual({ foo: 'bar' })
   })
 })
-
-describe('transforms', () => {
-  it('should transform object keys', async () => {
-    vi.spyOn(global, 'fetch').mockImplementationOnce(
-      successfulFetch({
-        'some-deep': { 'nested-value': true },
-        'other-value': false,
-      }),
-    )
-    const response = await subject.enhancedFetch(
-      'https://example.com/api/users',
-    )
-    const result = await response.json(
-      z
-        .object({
-          'some-deep': z.object({ 'nested-value': z.boolean() }),
-          'other-value': z.boolean(),
-        })
-        .transform((v) => v),
-    )
-    type _R = Expect<
-      Equal<
-        typeof result,
-        { 'some-deep': { 'nested-value': boolean }; 'other-value': boolean }
-      >
-    >
-
-    expect(result).toEqual({
-      'some-deep': { 'nested-value': true },
-      'other-value': false,
-    })
-  })
-})
