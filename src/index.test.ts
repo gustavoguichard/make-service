@@ -362,48 +362,38 @@ describe('enhancedFetch', () => {
   })
 })
 
-describe('makeService', () => {
-  it('should return an object with http methods', () => {
-    const api = subject.makeService('https://example.com/api')
-    for (const method of HTTP_METHODS) {
-      expect(
-        typeof api[method.toLocaleLowerCase() as Lowercase<subject.HTTPMethod>],
-      ).toBe('function')
-    }
-  })
-
-  it('should return an API with enhancedFetch', async () => {
+describe('makeFetcher', () => {
+  it('should return a applied enhancedFetch', async () => {
     vi.spyOn(global, 'fetch').mockImplementationOnce(
       successfulFetch({ foo: 'bar' }),
     )
-    const api = subject.makeService('https://example.com/api')
-    const result = await api
-      .post('/users')
-      .then((r) => r.json(z.object({ foo: z.string() })))
+    const service = subject.makeFetcher('https://example.com/api')
+    const result = await service('/users', { method: 'post' }).then((r) =>
+      r.json(z.object({ foo: z.string() })),
+    )
     type _R = Expect<Equal<typeof result, { foo: string }>>
     expect(result).toEqual({ foo: 'bar' })
     expect(reqMock).toHaveBeenCalledWith({
       url: 'https://example.com/api/users',
       headers: new Headers({ 'content-type': 'application/json' }),
-      method: 'POST',
+      method: 'post',
     })
   })
 
-  it('should add headers and method to the request', async () => {
+  it('should add headers to the request', async () => {
     vi.spyOn(global, 'fetch').mockImplementationOnce(
       successfulFetch({ foo: 'bar' }),
     )
-    const api = subject.makeService('https://example.com/api', {
+    const service = subject.makeFetcher('https://example.com/api', {
       Authorization: 'Bearer 123',
     })
-    await api.get('/users')
+    await service('/users')
     expect(reqMock).toHaveBeenCalledWith({
       url: 'https://example.com/api/users',
       headers: new Headers({
         authorization: 'Bearer 123',
         'content-type': 'application/json',
       }),
-      method: 'GET',
     })
   })
 
@@ -411,17 +401,16 @@ describe('makeService', () => {
     vi.spyOn(global, 'fetch').mockImplementationOnce(
       successfulFetch({ foo: 'bar' }),
     )
-    const api = subject.makeService('https://example.com/api', () => ({
+    const service = subject.makeFetcher('https://example.com/api', () => ({
       Authorization: 'Bearer 123',
     }))
-    await api.get('/users')
+    await service('/users')
     expect(reqMock).toHaveBeenCalledWith({
       url: 'https://example.com/api/users',
       headers: new Headers({
         authorization: 'Bearer 123',
         'content-type': 'application/json',
       }),
-      method: 'GET',
     })
   })
 
@@ -429,17 +418,19 @@ describe('makeService', () => {
     vi.spyOn(global, 'fetch').mockImplementationOnce(
       successfulFetch({ foo: 'bar' }),
     )
-    const api = subject.makeService('https://example.com/api', async () => ({
-      Authorization: 'Bearer 123',
-    }))
-    await api.get('/users')
+    const service = subject.makeFetcher(
+      'https://example.com/api',
+      async () => ({
+        Authorization: 'Bearer 123',
+      }),
+    )
+    await service('/users')
     expect(reqMock).toHaveBeenCalledWith({
       url: 'https://example.com/api/users',
       headers: new Headers({
         authorization: 'Bearer 123',
         'content-type': 'application/json',
       }),
-      method: 'GET',
     })
   })
 
@@ -448,8 +439,9 @@ describe('makeService', () => {
     vi.spyOn(global, 'fetch').mockImplementationOnce(
       successfulFetch({ foo: 'bar' }),
     )
-    const api = subject.makeService('https://example.com/api')
-    await api.post('/users', {
+    const service = subject.makeFetcher('https://example.com/api')
+    await service('/users', {
+      method: 'POST',
       body: { id: 1, name: { first: 'John', last: 'Doe' } },
       query: { admin: 'true' },
       trace,
@@ -462,5 +454,35 @@ describe('makeService', () => {
         body: `{"id":1,"name":{"first":"John","last":"Doe"}}`,
       },
     )
+  })
+})
+
+describe('makeService', () => {
+  it('should return an object with http methods', () => {
+    const service = subject.makeService('https://example.com/api')
+    for (const method of HTTP_METHODS) {
+      expect(
+        typeof service[
+          method.toLocaleLowerCase() as Lowercase<subject.HTTPMethod>
+        ],
+      ).toBe('function')
+    }
+  })
+
+  it('should return an API with enhancedFetch', async () => {
+    vi.spyOn(global, 'fetch').mockImplementationOnce(
+      successfulFetch({ foo: 'bar' }),
+    )
+    const service = subject.makeService('https://example.com/api')
+    const result = await service
+      .post('/users')
+      .then((r) => r.json(z.object({ foo: z.string() })))
+    type _R = Expect<Equal<typeof result, { foo: string }>>
+    expect(result).toEqual({ foo: 'bar' })
+    expect(reqMock).toHaveBeenCalledWith({
+      url: 'https://example.com/api/users',
+      headers: new Headers({ 'content-type': 'application/json' }),
+      method: 'POST',
+    })
   })
 })

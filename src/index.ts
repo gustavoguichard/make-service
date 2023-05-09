@@ -2,6 +2,7 @@ export {
   addQueryToURL,
   enhancedFetch,
   ensureStringBody,
+  makeFetcher,
   makeGetApiURL,
   makeService,
   mergeHeaders,
