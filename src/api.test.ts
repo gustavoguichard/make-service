@@ -107,7 +107,12 @@ describe('enhancedFetch', () => {
     await subject.enhancedFetch(
       'https://example.com/api/users/:user/page/:page',
       {
-        params: { user: '1', page: '2', foo: 'bar' },
+        params: {
+          user: '1',
+          page: '2',
+          // @ts-expect-error
+          foo: 'bar',
+        },
       },
     )
     expect(reqMock).toHaveBeenCalledWith({
@@ -211,10 +216,10 @@ describe('makeFetcher', () => {
     vi.spyOn(global, 'fetch').mockImplementationOnce(
       successfulFetch({ foo: 'bar' }),
     )
-    const service = subject.makeFetcher('https://example.com/api', {
+    const fetcher = subject.makeFetcher('https://example.com/api', {
       Authorization: 'Bearer 123',
     })
-    await service('/users')
+    await fetcher('/users')
     expect(reqMock).toHaveBeenCalledWith({
       url: 'https://example.com/api/users',
       headers: new Headers({
@@ -224,14 +229,32 @@ describe('makeFetcher', () => {
     })
   })
 
+  it('should accept a typed params object', async () => {
+    vi.spyOn(global, 'fetch').mockImplementationOnce(
+      successfulFetch({ foo: 'bar' }),
+    )
+    const fetcher = subject.makeFetcher('https://example.com/api')
+    await fetcher('/users/:id', {
+      params: {
+        id: '1',
+        // @ts-expect-error
+        foo: 'bar',
+      },
+    })
+    expect(reqMock).toHaveBeenCalledWith({
+      url: 'https://example.com/api/users/1',
+      headers: new Headers({ 'content-type': 'application/json' }),
+    })
+  })
+
   it('should accept a function for dynamic headers', async () => {
     vi.spyOn(global, 'fetch').mockImplementationOnce(
       successfulFetch({ foo: 'bar' }),
     )
-    const service = subject.makeFetcher('https://example.com/api', () => ({
+    const fetcher = subject.makeFetcher('https://example.com/api', () => ({
       Authorization: 'Bearer 123',
     }))
-    await service('/users')
+    await fetcher('/users')
     expect(reqMock).toHaveBeenCalledWith({
       url: 'https://example.com/api/users',
       headers: new Headers({
@@ -245,13 +268,13 @@ describe('makeFetcher', () => {
     vi.spyOn(global, 'fetch').mockImplementationOnce(
       successfulFetch({ foo: 'bar' }),
     )
-    const service = subject.makeFetcher(
+    const fetcher = subject.makeFetcher(
       'https://example.com/api',
       async () => ({
         Authorization: 'Bearer 123',
       }),
     )
-    await service('/users')
+    await fetcher('/users')
     expect(reqMock).toHaveBeenCalledWith({
       url: 'https://example.com/api/users',
       headers: new Headers({
@@ -266,8 +289,8 @@ describe('makeFetcher', () => {
     vi.spyOn(global, 'fetch').mockImplementationOnce(
       successfulFetch({ foo: 'bar' }),
     )
-    const service = subject.makeFetcher('https://example.com/api')
-    await service('/users', {
+    const fetcher = subject.makeFetcher('https://example.com/api')
+    await fetcher('/users', {
       method: 'POST',
       body: { id: 1, name: { first: 'John', last: 'Doe' } },
       query: { admin: 'true' },
@@ -308,6 +331,25 @@ describe('makeService', () => {
       url: 'https://example.com/api/users',
       headers: new Headers({ 'content-type': 'application/json' }),
       method: 'POST',
+    })
+  })
+
+  it('should accept a typed params object', async () => {
+    vi.spyOn(global, 'fetch').mockImplementationOnce(
+      successfulFetch({ foo: 'bar' }),
+    )
+    const service = subject.makeService('https://example.com/api')
+    await service.get('/users/:id', {
+      params: {
+        id: '1',
+        // @ts-expect-error
+        foo: 'bar',
+      },
+    })
+    expect(reqMock).toHaveBeenCalledWith({
+      url: 'https://example.com/api/users/1',
+      headers: new Headers({ 'content-type': 'application/json' }),
+      method: 'GET',
     })
   })
 })

@@ -55,9 +55,9 @@ function typedResponse(response: Response): TypedResponse {
  * const untyped = await response.json();
  * //    ^? unknown
  */
-async function enhancedFetch(
-  url: string | URL,
-  requestInit?: EnhancedRequestInit,
+async function enhancedFetch<T extends string | URL>(
+  url: T,
+  requestInit?: EnhancedRequestInit<T>,
 ) {
   const { query, trace, ...reqInit } = requestInit ?? {}
   const headers = mergeHeaders(
@@ -66,7 +66,7 @@ async function enhancedFetch(
     },
     reqInit.headers ?? {},
   )
-  const withParams = replaceURLParams(url, reqInit.params ?? {})
+  const withParams = replaceURLParams<T>(url, reqInit.params ?? ({} as never))
   const fullURL = addQueryToURL(withParams, query)
   const body = ensureStringBody(reqInit.body)
 
@@ -92,7 +92,10 @@ function makeFetcher(
   baseURL: string | URL,
   baseHeaders?: HeadersInit | (() => HeadersInit | Promise<HeadersInit>),
 ) {
-  return async (path: string, requestInit: EnhancedRequestInit = {}) => {
+  return async <T extends string>(
+    path: T,
+    requestInit: EnhancedRequestInit<T> = {},
+  ) => {
     const url = makeGetApiURL(baseURL)(path)
     const response = await enhancedFetch(url, {
       ...requestInit,
@@ -125,8 +128,10 @@ function makeService(
   const fetcher = makeFetcher(baseURL, baseHeaders)
 
   function appliedService(method: HTTPMethod) {
-    return async (path: string, requestInit: ServiceRequestInit = {}) =>
-      fetcher(path, { ...requestInit, method })
+    return async <T extends string>(
+      path: T,
+      requestInit: ServiceRequestInit<T> = {},
+    ) => fetcher(path, { ...requestInit, method })
   }
 
   let service = {} as Record<

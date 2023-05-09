@@ -17,15 +17,21 @@ type TypedResponse = Omit<Response, 'json' | 'text'> & {
   text: TypedResponseText
 }
 
-type EnhancedRequestInit = Omit<RequestInit, 'body' | 'method'> & {
+type PathParams<T> = T extends string
+  ? ExtractPathParams<T> extends Record<string, unknown>
+    ? ExtractPathParams<T>
+    : Record<string, string>
+  : Record<string, string>
+
+type EnhancedRequestInit<T = string> = Omit<RequestInit, 'body' | 'method'> & {
   method?: HTTPMethod | Lowercase<HTTPMethod>
   body?: JSONValue | BodyInit | null
   query?: SearchParams
-  params?: Record<string, string>
+  params?: PathParams<T>
   trace?: (...args: Parameters<typeof fetch>) => void
 }
 
-type ServiceRequestInit = Omit<EnhancedRequestInit, 'method'>
+type ServiceRequestInit<T = string> = Omit<EnhancedRequestInit<T>, 'method'>
 
 type HTTPMethod = (typeof HTTP_METHODS)[number]
 
@@ -36,14 +42,13 @@ type Prettify<T> = {
   [K in keyof T]: T[K]
 } & {}
 
-type NoEmpty<T> = keyof T extends never ? never : T
-type PathParams<T extends string> = NoEmpty<
+type ExtractPathParams<T extends string> =
   T extends `${infer _}:${infer Param}/${infer Rest}`
-    ? Prettify<{ [K in Param]: string } & PathParams<Rest>>
+    ? Prettify<Omit<{ [K in Param]: string } & ExtractPathParams<Rest>, ''>>
     : T extends `${infer _}:${infer Param}`
     ? { [K in Param]: string }
     : {}
->
+
 export type {
   EnhancedRequestInit,
   HTTPMethod,

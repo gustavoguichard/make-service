@@ -1,4 +1,4 @@
-import { EnhancedRequestInit, Schema } from './types'
+import { Schema } from './types'
 
 /**
  * It returns the JSON object or throws an error if the response is not ok.
