@@ -503,5 +503,9 @@ const url = replaceURLParams(
 // It will return: "https://example.com/users/2/posts/3"
 ```
 
-## Thank you
+# Acknowledgements
+This library is part of a code I've been carrying around for a while, using it in many projects.
+It all started out of ideas and experiences I had when I worked heavily in a react data-layer library called [croods](https://github.com/seasonedcc/croods) which was originally created by [Daniel Weinmann](https://github.com/danielweinmann).
+After getting some experience with [zod](https://zod.dev/) I approached the problem with a very different mindset and was very happy with the result.
+Then [Matt Pocock](https://github.com/mattpocock) launched [zod-fetch](https://github.com/mattpocock/zod-fetch) which had similar ideas and I decided to extract my code and make it available for everyone to use.
 I really appreciate your feedback and contributions. If you have any questions, feel free to open an issue or contact me on [Twitter](https://twitter.com/gugaguichard).
