@@ -6,6 +6,8 @@ const HTTP_METHODS = [
   'PATCH',
   'OPTIONS',
   'HEAD',
+  'CONNECT',
+  // 'TRACE', it has no support in most browsers yet
 ] as const
 
 export { HTTP_METHODS }
