@@ -43,6 +43,7 @@ const users = await response.json(usersSchema);
   - [makeFetcher](#makefetcher)
   - [enhancedFetch](#enhancedfetch)
   - [typedResponse](#typedresponse)
+- [Payload transformers](#payload-transformers)
 - [Other available primitives](#other-available-primitives)
   - [addQueryToURL](#addquerytourl)
   - [ensureStringBody](#ensurestringbody)
