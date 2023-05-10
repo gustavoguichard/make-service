@@ -124,4 +124,14 @@ describe('deep transforms', () => {
       >
     >
   })
+
+  test('should transform deep nested objects and array of objects', () => {
+    const result = subject.kebabToCamel([
+      { some: { 'deep-nested': [{ value: true }] } },
+    ])
+    expect(result).toEqual([{ some: { deepNested: [{ value: true }] } }])
+    type test = Expect<
+      Equal<typeof result, { some: { deepNested: { value: boolean }[] } }[]>
+    >
+  })
 })

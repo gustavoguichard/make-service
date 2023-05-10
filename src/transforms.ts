@@ -63,8 +63,11 @@ function toSnakeCase(str: string) {
 }
 
 function deepTransformKeys<T>(obj: T, transform: (s: string) => string): T {
-  if (typeOf(obj) !== 'object') return obj
+  if (!['object', 'array'].includes(typeOf(obj))) return obj
 
+  if (Array.isArray(obj)) {
+    return obj.map((x) => deepTransformKeys(x, transform)) as T
+  }
   const res = {} as T
   for (const key in obj) {
     res[transform(key) as keyof T] = deepTransformKeys(obj[key], transform)
@@ -72,44 +75,68 @@ function deepTransformKeys<T>(obj: T, transform: (s: string) => string): T {
   return res
 }
 
-type DeepKebabToCamel<T> = T extends Record<string, any>
-  ? { [K in keyof T as KebabToCamel<K>]: DeepKebabToCamel<T[K]> }
-  : T
+type DeepKebabToCamel<T> = T extends [any, ...any]
+  ? { [I in keyof T]: DeepKebabToCamel<T[I]> }
+  : T extends (infer V)[]
+  ? DeepKebabToCamel<V>[]
+  : {
+      [K in keyof T as KebabToCamel<K>]: DeepKebabToCamel<T[K]>
+    }
 function kebabToCamel<T>(obj: T): DeepKebabToCamel<T> {
   return deepTransformKeys(obj, toCamelCase) as never
 }
 
-type DeepSnakeToCamel<T> = T extends Record<string, any>
-  ? { [K in keyof T as SnakeToCamel<K>]: DeepSnakeToCamel<T[K]> }
-  : T
+type DeepSnakeToCamel<T> = T extends [any, ...any]
+  ? { [I in keyof T]: DeepSnakeToCamel<T[I]> }
+  : T extends (infer V)[]
+  ? DeepSnakeToCamel<V>[]
+  : {
+      [K in keyof T as SnakeToCamel<K>]: DeepSnakeToCamel<T[K]>
+    }
 function snakeToCamel<T>(obj: T): DeepSnakeToCamel<T> {
   return deepTransformKeys(obj, toCamelCase) as never
 }
 
-type DeepCamelToSnake<T> = T extends Record<string, any>
-  ? { [K in keyof T as CamelToSnake<K>]: DeepCamelToSnake<T[K]> }
-  : T
+type DeepCamelToSnake<T> = T extends [any, ...any]
+  ? { [I in keyof T]: DeepCamelToSnake<T[I]> }
+  : T extends (infer V)[]
+  ? DeepCamelToSnake<V>[]
+  : {
+      [K in keyof T as CamelToSnake<K>]: DeepCamelToSnake<T[K]>
+    }
 function camelToSnake<T>(obj: T): DeepCamelToSnake<T> {
   return deepTransformKeys(obj, toSnakeCase) as never
 }
 
-type DeepCamelToKebab<T> = T extends Record<string, any>
-  ? { [K in keyof T as CamelToKebab<K>]: DeepCamelToKebab<T[K]> }
-  : T
+type DeepCamelToKebab<T> = T extends [any, ...any]
+  ? { [I in keyof T]: DeepCamelToKebab<T[I]> }
+  : T extends (infer V)[]
+  ? DeepCamelToKebab<V>[]
+  : {
+      [K in keyof T as CamelToKebab<K>]: DeepCamelToKebab<T[K]>
+    }
 function camelToKebab<T>(obj: T): DeepCamelToKebab<T> {
   return deepTransformKeys(obj, toKebabCase) as never
 }
 
-type DeepSnakeToKebab<T> = T extends Record<string, any>
-  ? { [K in keyof T as SnakeToKebab<K>]: DeepSnakeToKebab<T[K]> }
-  : T
+type DeepSnakeToKebab<T> = T extends [any, ...any]
+  ? { [I in keyof T]: DeepSnakeToKebab<T[I]> }
+  : T extends (infer V)[]
+  ? DeepSnakeToKebab<V>[]
+  : {
+      [K in keyof T as SnakeToKebab<K>]: DeepSnakeToKebab<T[K]>
+    }
 function snakeToKebab<T>(obj: T): DeepSnakeToKebab<T> {
   return deepTransformKeys(obj, toKebabCase) as never
 }
 
-type DeepKebabToSnake<T> = T extends Record<string, any>
-  ? { [K in keyof T as KebabToSnake<K>]: DeepKebabToSnake<T[K]> }
-  : T
+type DeepKebabToSnake<T> = T extends [any, ...any]
+  ? { [I in keyof T]: DeepKebabToSnake<T[I]> }
+  : T extends (infer V)[]
+  ? DeepKebabToSnake<V>[]
+  : {
+      [K in keyof T as KebabToSnake<K>]: DeepKebabToSnake<T[K]>
+    }
 function kebabToSnake<T>(obj: T): DeepKebabToSnake<T> {
   return deepTransformKeys(obj, toSnakeCase) as never
 }
