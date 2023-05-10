@@ -1,5 +1,5 @@
 import { typeOf } from './internals'
-import { EnhancedRequestInit, JSONValue, SearchParams } from './types'
+import { JSONValue, PathParams, SearchParams } from './types'
 
 /**
  * @param url a string or URL to which the query parameters will be added
@@ -91,8 +91,8 @@ function mergeHeaders(
  * @returns the url with the params replaced and with the same type as the given url
  */
 function replaceURLParams<T extends string | URL>(
-  url: string | URL,
-  params: EnhancedRequestInit['params'],
+  url: T,
+  params: PathParams<T>,
 ): T {
   // TODO: use the URL Pattern API as soon as it has better browser support
   if (!params) return url as T
