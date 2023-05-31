@@ -35,8 +35,8 @@ type ServiceRequestInit<T = string> = Omit<EnhancedRequestInit<T>, 'method'>
 
 type BaseOptions = {
   headers?: HeadersInit | (() => HeadersInit | Promise<HeadersInit>)
-  requestTransformer?: (request: EnhancedRequestInit) => EnhancedRequestInit
-  responseTransformer?: (response: TypedResponse) => TypedResponse
+  requestTransformer?: (request: EnhancedRequestInit) => EnhancedRequestInit | Promise<EnhancedRequestInit>
+  responseTransformer?: (response: TypedResponse) => TypedResponse | Promise<TypedResponse>
 }
 
 type HTTPMethod = (typeof HTTP_METHODS)[number]
