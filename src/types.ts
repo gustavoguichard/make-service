@@ -23,20 +23,24 @@ type PathParams<T> = T extends string
     : Record<string, string>
   : Record<string, string>
 
+type EnhancedBodyInit = JSONValue | BodyInit | null
+
 type EnhancedRequestInit<T = string> = Omit<RequestInit, 'body' | 'method'> & {
   method?: HTTPMethod | Lowercase<HTTPMethod>
-  body?: JSONValue | BodyInit | null
+  body?: EnhancedBodyInit
   query?: SearchParams
   params?: PathParams<T>
   trace?: (...args: Parameters<typeof fetch>) => void
 }
 
 type ServiceRequestInit<T = string> = Omit<EnhancedRequestInit<T>, 'method'>
+type RequestTransformer = (request: EnhancedRequestInit) => EnhancedRequestInit
+type ResponseTransformer = (response: TypedResponse) => TypedResponse
 
 type BaseOptions = {
   headers?: HeadersInit | (() => HeadersInit | Promise<HeadersInit>)
-  requestTransformer?: (request: EnhancedRequestInit) => EnhancedRequestInit | Promise<EnhancedRequestInit>
-  responseTransformer?: (response: TypedResponse) => TypedResponse | Promise<TypedResponse>
+  requestTransformer?: RequestTransformer
+  responseTransformer?: ResponseTransformer
 }
 
 type HTTPMethod = (typeof HTTP_METHODS)[number]
@@ -56,6 +60,7 @@ type ExtractPathParams<T extends string> =
     : {}
 
 export type {
+  EnhancedBodyInit,
   EnhancedRequestInit,
   HTTPMethod,
   JSONValue,
@@ -67,4 +72,6 @@ export type {
   TypedResponse,
   TypedResponseJson,
   TypedResponseText,
+  RequestTransformer,
+  ResponseTransformer,
 }

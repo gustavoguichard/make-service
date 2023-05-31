@@ -135,3 +135,114 @@ describe('deep transforms', () => {
     >
   })
 })
+
+describe('makeRequestTransformer', () => {
+  test('with query and body objects', () => {
+    const transformer = subject.makeRequestTransformer((key) =>
+      key.toUpperCase(),
+    )
+
+    const requestInit = transformer({
+      query: { myQuery: 'foo' },
+      body: { some: { deepNested: { value: true } }, otherValue: true },
+    })
+
+    expect(requestInit.body).toEqual({
+      SOME: { DEEPNESTED: { VALUE: true } },
+      OTHERVALUE: true,
+    })
+
+    expect(requestInit.query).toEqual({ MYQUERY: 'foo' })
+  })
+
+  test('with array of tuples query', () => {
+    const transformer = subject.makeRequestTransformer((key) =>
+      key.toUpperCase(),
+    )
+
+    const requestInit = transformer({
+      query: [
+        ['foo', '1'],
+        ['bar', '2'],
+      ],
+    })
+
+    expect(requestInit.query).toEqual([
+      ['FOO', '1'],
+      ['BAR', '2'],
+    ])
+  })
+
+  test('with URLSearchParams query', () => {
+    const transformer = subject.makeRequestTransformer((key) =>
+      key.toUpperCase(),
+    )
+
+    const query = new URLSearchParams([
+      ['first', 'foo'],
+      ['first', 'bar'],
+      ['last', 'zoo'],
+    ])
+
+    const requestInit = transformer({ query })
+
+    expect(requestInit.query).toEqual(
+      new URLSearchParams([
+        ['FIRST', 'foo'],
+        ['FIRST', 'bar'],
+        ['LAST', 'zoo'],
+      ]),
+    )
+  })
+
+  test('with string query', () => {
+    const transformer = subject.makeRequestTransformer((key) =>
+      key.toUpperCase(),
+    )
+
+    const requestInit = transformer({ query: 'myQuery=foo' })
+    expect(requestInit.query).toEqual('MYQUERY=foo')
+  })
+
+  test('with URLSearchParams body', () => {
+    const transformer = subject.makeRequestTransformer((key) =>
+      key.toUpperCase(),
+    )
+
+    const body = new URLSearchParams([
+      ['first', 'foo'],
+      ['first', 'bar'],
+      ['last', 'zoo'],
+    ])
+
+    const requestInit = transformer({ body })
+
+    expect(requestInit.body).toEqual(
+      new URLSearchParams([
+        ['FIRST', 'foo'],
+        ['FIRST', 'bar'],
+        ['LAST', 'zoo'],
+      ]),
+    )
+  })
+
+  test('with FormData body', () => {
+    const transformer = subject.makeRequestTransformer((key) =>
+      key.toUpperCase(),
+    )
+
+    const body = new FormData()
+    body.append('first', 'foo')
+    body.append('first', 'bar')
+    body.append('last', 'zoo')
+
+    const requestInit = transformer({ body })
+
+    const formData = new FormData()
+    formData.append('FIRST', 'foo')
+    formData.append('FIRST', 'bar')
+    formData.append('LAST', 'zoo')
+
+    expect(requestInit.body).toEqual(formData)
+  })
+})

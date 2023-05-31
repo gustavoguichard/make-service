@@ -1,4 +1,9 @@
 import { typeOf } from './internals'
+import type {
+  EnhancedBodyInit,
+  RequestTransformer,
+  SearchParams,
+} from './types'
 
 type KebabToCamel<Str> = Str extends `${infer First}-${infer Rest}`
   ? `${First}${Capitalize<KebabToCamel<Rest>>}`
@@ -141,6 +146,78 @@ function kebabToSnake<T>(obj: T): DeepKebabToSnake<T> {
   return deepTransformKeys(obj, toSnakeCase) as never
 }
 
+function transformFormData(
+  formData: FormData,
+  transformKey: (str: string) => string,
+) {
+  const transformed = new FormData()
+  for (const [key, value] of formData) {
+    transformed.append(transformKey(key), value)
+  }
+  return transformed
+}
+
+function transformURLSearchParams(
+  searchParams: URLSearchParams,
+  transformKey: (str: string) => string,
+) {
+  const transformed = new URLSearchParams()
+  for (const [key, value] of searchParams) {
+    transformed.append(transformKey(key), value)
+  }
+  return transformed
+}
+
+function transformQuery(
+  query: SearchParams,
+  transformKey: (str: string) => string,
+) {
+  if (Array.isArray(query)) {
+    return query.map(([key, value]) => [transformKey(key), value])
+  }
+
+  if (query instanceof URLSearchParams) {
+    return transformURLSearchParams(query, transformKey)
+  }
+
+  if (typeof query === 'string') {
+    const searchParams = new URLSearchParams(query)
+    return transformURLSearchParams(searchParams, transformKey).toString()
+  }
+
+  if (typeof query === 'object') return deepTransformKeys(query, transformKey)
+
+  return query
+}
+
+function transformBody(
+  body: EnhancedBodyInit | undefined,
+  transformKey: (str: string) => string,
+) {
+  if (body instanceof URLSearchParams) {
+    return transformURLSearchParams(body, transformKey)
+  }
+
+  if (body instanceof FormData) {
+    return transformFormData(body, transformKey)
+  }
+
+  if (typeof body === 'object') return deepTransformKeys(body, transformKey)
+
+  return body
+}
+
+function makeRequestTransformer(
+  transformKey: (str: string) => string,
+): RequestTransformer {
+  return (request) => {
+    const query = transformQuery(request.query, transformKey)
+    const body = transformBody(request.body, transformKey)
+
+    return { ...request, query, body }
+  }
+}
+
 export type {
   CamelToKebab,
   CamelToSnake,
@@ -162,4 +239,5 @@ export {
   kebabToSnake,
   snakeToCamel,
   snakeToKebab,
+  makeRequestTransformer,
 }
