@@ -35,9 +35,12 @@ const users = await response.json(usersSchema);
     - [Runtime type-checking and parsing the response body](#runtime-type-checking-and-parsing-the-response-body)
     - [Supported HTTP Verbs](#supported-http-verbs)
     - [Headers](#headers)
-      - [Passing a function as `baseHeaders`](#passing-a-function-as-baseheaders)
+      - [Passing a function as `headers`](#passing-a-function-as-headers)
       - [Deleting a previously set header](#deleting-a-previously-set-header)
     - [Base URL](#base-url)
+    - [Transformers](#transformers)
+      - [Request transformers](#request-transformers)
+      - [Response transformers](#response-transformers)
     - [Body](#body)
     - [Query](#query)
     - [Params](#params)
@@ -220,6 +223,35 @@ const response = await service.get("/users?admin=true")
 // It will call "https://example.com/api/users?admin=true"
 ```
 You can use the [`makeGetApiUrl`](#makegetapiurl) method to do that kind of URL composition.
+
+### Transformers
+`makeService` can also receive `requestTransformer` and `responseTransformer` as options that will be applied to all requests.
+
+#### Request transformers
+You can transform the request in any way you want, like:
+
+```ts
+const service = makeService('https://example.com/api', {
+  requestTransformer: (request) => ({ ...request, query: { admin: 'true' } }),
+})
+
+const response = await service.get("/users")
+
+// It will call "https://example.com/api/users?admin=true"
+```
+
+#### Response transformers
+You can also transform the response in any way you want, like:
+
+```ts
+const service = makeService('https://example.com/api', {
+  responseTransformer: (response) => ({ ...response, statusText: 'It worked!' }),
+})
+
+const response = await service.get("/users")
+
+// response.statusText will be 'It worked!'
+```
 
 ### Body
 The function can also receive a `body` object that will be stringified and sent as the request body:
