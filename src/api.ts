@@ -95,9 +95,11 @@ function makeFetcher(baseURL: string | URL, baseOptions: BaseOptions = {}) {
     requestInit: EnhancedRequestInit<T> = {},
   ) => {
     const { headers } = baseOptions
+    const requestTransformer =
+      baseOptions.requestTransformer ?? ((requestInit) => requestInit)
     const url = makeGetApiURL(baseURL)(path)
     const response = await enhancedFetch(url, {
-      ...requestInit,
+      ...requestTransformer(requestInit),
       headers: mergeHeaders(
         typeof headers === 'function' ? await headers() : headers ?? {},
         requestInit?.headers ?? {},
