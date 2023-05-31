@@ -8,6 +8,7 @@ import {
   replaceURLParams,
 } from './primitives'
 import {
+  BaseOptions,
   EnhancedRequestInit,
   HTTPMethod,
   ServiceRequestInit,
@@ -88,21 +89,17 @@ async function enhancedFetch<T extends string | URL>(
  * const users = await response.json(userSchema);
  * //    ^? User[]
  */
-function makeFetcher(
-  baseURL: string | URL,
-  baseHeaders?: HeadersInit | (() => HeadersInit | Promise<HeadersInit>),
-) {
+function makeFetcher(baseURL: string | URL, baseOptions: BaseOptions = {}) {
   return async <T extends string>(
     path: T,
     requestInit: EnhancedRequestInit<T> = {},
   ) => {
+    const { headers } = baseOptions
     const url = makeGetApiURL(baseURL)(path)
     const response = await enhancedFetch(url, {
       ...requestInit,
       headers: mergeHeaders(
-        typeof baseHeaders === 'function'
-          ? await baseHeaders()
-          : baseHeaders ?? {},
+        typeof headers === 'function' ? await headers() : headers ?? {},
         requestInit?.headers ?? {},
       ),
     })
@@ -121,11 +118,8 @@ function makeFetcher(
  * const users = await response.json(userSchema);
  * //    ^? User[]
  */
-function makeService(
-  baseURL: string | URL,
-  baseHeaders?: HeadersInit | (() => HeadersInit | Promise<HeadersInit>),
-) {
-  const fetcher = makeFetcher(baseURL, baseHeaders)
+function makeService(baseURL: string | URL, baseOptions?: BaseOptions) {
+  const fetcher = makeFetcher(baseURL, baseOptions)
 
   function appliedService(method: HTTPMethod) {
     return async <T extends string>(
