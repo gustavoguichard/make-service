@@ -33,6 +33,10 @@ type EnhancedRequestInit<T = string> = Omit<RequestInit, 'body' | 'method'> & {
 
 type ServiceRequestInit<T = string> = Omit<EnhancedRequestInit<T>, 'method'>
 
+type BaseOptions = {
+  headers?: HeadersInit | (() => HeadersInit | Promise<HeadersInit>)
+}
+
 type HTTPMethod = (typeof HTTP_METHODS)[number]
 
 type TypedResponseJson = ReturnType<typeof getJson>
@@ -57,6 +61,7 @@ export type {
   Schema,
   SearchParams,
   ServiceRequestInit,
+  BaseOptions,
   TypedResponse,
   TypedResponseJson,
   TypedResponseText,
