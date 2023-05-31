@@ -268,6 +268,30 @@ describe('makeFetcher', () => {
     })
   })
 
+  it('should transform the response', async () => {
+    vi.spyOn(global, 'fetch').mockImplementationOnce(
+      successfulFetch({ foo: 'bar' }),
+    )
+    const fetcher = subject.makeFetcher('https://example.com/api', {
+      headers: {
+        Authorization: 'Bearer 123',
+      },
+      responseTransformer: (response) => ({
+        ...response,
+        statusText: 'Foo Bar',
+      }),
+    })
+    const response = await fetcher('/users')
+    expect(response.statusText).toEqual('Foo Bar')
+    expect(reqMock).toHaveBeenCalledWith({
+      url: 'https://example.com/api/users',
+      headers: new Headers({
+        authorization: 'Bearer 123',
+        'content-type': 'application/json',
+      }),
+    })
+  })
+
   it('should accept a typed params object', async () => {
     vi.spyOn(global, 'fetch').mockImplementationOnce(
       successfulFetch({ foo: 'bar' }),

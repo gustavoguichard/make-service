@@ -15,6 +15,8 @@ import {
   TypedResponse,
 } from './types'
 
+const identity = <T>(value: T) => value
+
 /**
  * It hacks the Response object to add typed json and text methods
  * @param response the Response to be proxied
@@ -95,8 +97,8 @@ function makeFetcher(baseURL: string | URL, baseOptions: BaseOptions = {}) {
     requestInit: EnhancedRequestInit<T> = {},
   ) => {
     const { headers } = baseOptions
-    const requestTransformer =
-      baseOptions.requestTransformer ?? ((requestInit) => requestInit)
+    const requestTransformer = baseOptions.requestTransformer ?? identity
+    const responseTransformer = baseOptions.responseTransformer ?? identity
     const url = makeGetApiURL(baseURL)(path)
     const response = await enhancedFetch(url, {
       ...requestTransformer(requestInit),
@@ -105,7 +107,7 @@ function makeFetcher(baseURL: string | URL, baseOptions: BaseOptions = {}) {
         requestInit?.headers ?? {},
       ),
     })
-    return response
+    return responseTransformer(response)
   }
 }
 
