@@ -40,7 +40,6 @@ const users = await response.json(usersSchema);
     - [Base URL](#base-url)
     - [Transformers](#transformers)
       - [Request transformers](#request-transformers)
-        - [Out-of-the-box request transformers](#out-of-the-box-request-transformers)
       - [Response transformers](#response-transformers)
     - [Body](#body)
     - [Query](#query)
@@ -285,6 +284,39 @@ const service = makeService('https://example.com/api', {
 const response = await service.get("/users")
 
 // response.statusText will be 'It worked!'
+```
+
+##### Out-of-the-box response transformers
+
+###### kebabResponse
+Transforms all keys of the response's JSON body to kebab-case.
+
+```ts
+const service = makeService('https://api.com', { responseTransformer: kebabResponse })
+```
+
+###### snakeResponse
+Transforms all keys of the response's JSON body to snake_case.
+
+```ts
+const service = makeService('https://api.com', { responseTransformer: snakeResponse })
+```
+
+###### camelResponse
+Transforms all keys of the response's JSON body to camelCase.
+
+```ts
+const service = makeService('https://api.com', { responseTransformer: camelResponse })
+```
+
+###### makeResponseTransformer
+Creates a responseTransformer to use with makeService or makeFetcher that will deeply transform the keys of the JSON body of the response. This is used behind the scenes by all other included response transformers.
+
+```ts
+const responseTransformer = makeResponseTransformer((key) => key.toUpperCase())
+
+const service = makeService('https://api.com', { responseTransformer })
+// This will uppercase all keys of a request's JSON body
 ```
 
 ### Body
