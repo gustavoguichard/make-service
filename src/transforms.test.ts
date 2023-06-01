@@ -137,12 +137,12 @@ describe('deep transforms', () => {
 })
 
 describe('makeRequestTransformer', () => {
-  test('with query and body objects', () => {
+  test('with query and body objects', async () => {
     const transformer = subject.makeRequestTransformer((key) =>
       key.toUpperCase(),
     )
 
-    const requestInit = transformer({
+    const requestInit = await transformer({
       query: { myQuery: 'foo' },
       body: { some: { deepNested: { value: true } }, otherValue: true },
     })
@@ -155,12 +155,12 @@ describe('makeRequestTransformer', () => {
     expect(requestInit.query).toEqual({ MYQUERY: 'foo' })
   })
 
-  test('with array of tuples query', () => {
+  test('with array of tuples query', async () => {
     const transformer = subject.makeRequestTransformer((key) =>
       key.toUpperCase(),
     )
 
-    const requestInit = transformer({
+    const requestInit = await transformer({
       query: [
         ['foo', '1'],
         ['bar', '2'],
@@ -173,7 +173,7 @@ describe('makeRequestTransformer', () => {
     ])
   })
 
-  test('with URLSearchParams query', () => {
+  test('with URLSearchParams query', async () => {
     const transformer = subject.makeRequestTransformer((key) =>
       key.toUpperCase(),
     )
@@ -184,7 +184,7 @@ describe('makeRequestTransformer', () => {
       ['last', 'zoo'],
     ])
 
-    const requestInit = transformer({ query })
+    const requestInit = await transformer({ query })
 
     expect(requestInit.query).toEqual(
       new URLSearchParams([
@@ -195,16 +195,16 @@ describe('makeRequestTransformer', () => {
     )
   })
 
-  test('with string query', () => {
+  test('with string query', async () => {
     const transformer = subject.makeRequestTransformer((key) =>
       key.toUpperCase(),
     )
 
-    const requestInit = transformer({ query: 'myQuery=foo' })
+    const requestInit = await transformer({ query: 'myQuery=foo' })
     expect(requestInit.query).toEqual('MYQUERY=foo')
   })
 
-  test('with URLSearchParams body', () => {
+  test('with URLSearchParams body', async () => {
     const transformer = subject.makeRequestTransformer((key) =>
       key.toUpperCase(),
     )
@@ -215,7 +215,7 @@ describe('makeRequestTransformer', () => {
       ['last', 'zoo'],
     ])
 
-    const requestInit = transformer({ body })
+    const requestInit = await transformer({ body })
 
     expect(requestInit.body).toEqual(
       new URLSearchParams([
@@ -226,7 +226,7 @@ describe('makeRequestTransformer', () => {
     )
   })
 
-  test('with FormData body', () => {
+  test('with FormData body', async () => {
     const transformer = subject.makeRequestTransformer((key) =>
       key.toUpperCase(),
     )
@@ -236,7 +236,7 @@ describe('makeRequestTransformer', () => {
     body.append('first', 'bar')
     body.append('last', 'zoo')
 
-    const requestInit = transformer({ body })
+    const requestInit = await transformer({ body })
 
     const formData = new FormData()
     formData.append('FIRST', 'foo')
@@ -246,33 +246,33 @@ describe('makeRequestTransformer', () => {
     expect(requestInit.body).toEqual(formData)
   })
 
-  test('with ReadableStream body', () => {
+  test('with ReadableStream body', async () => {
     const transformer = subject.makeRequestTransformer((key) =>
       key.toUpperCase(),
     )
 
     const body = new ReadableStream()
-    const requestInit = transformer({ body })
+    const requestInit = await transformer({ body })
     expect(requestInit.body).toEqual(body)
   })
 
-  test('with Blob body', () => {
+  test('with Blob body', async () => {
     const transformer = subject.makeRequestTransformer((key) =>
       key.toUpperCase(),
     )
 
     const body = new Blob()
-    const requestInit = transformer({ body })
+    const requestInit = await transformer({ body })
     expect(requestInit.body).toEqual(body)
   })
 
-  test('with ArrayBuffer body', () => {
+  test('with ArrayBuffer body', async () => {
     const transformer = subject.makeRequestTransformer((key) =>
       key.toUpperCase(),
     )
 
     const body = new ArrayBuffer(1)
-    const requestInit = transformer({ body })
+    const requestInit = await transformer({ body })
     expect(requestInit.body).toEqual(body)
   })
 })
