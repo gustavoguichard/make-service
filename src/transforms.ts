@@ -205,6 +205,17 @@ function transformBody(
   return deepTransformKeys(body, transformKey)
 }
 
+/**
+ * Creates a requestTransformer to use with makeService or makeFetcher that
+ * will deeply transform the keys of the query and the body of the request.
+ * @param transformKey a function that receives a key and transforms it
+ * @returns a RequestTransformer function
+ * @example const requestTransformer = makeRequestTransformer((key) =>
+ *   key.toUpperCase(),
+ * )
+ * const service = makeService('https://api.com', { requestTransformer })
+ * // This will uppercase all keys of a request's query and body
+ */
 function makeRequestTransformer(
   transformKey: (str: string) => string,
 ): RequestTransformer {
