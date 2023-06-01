@@ -41,7 +41,6 @@ const users = await response.json(usersSchema);
     - [Transformers](#transformers)
       - [Request transformers](#request-transformers)
         - [Out-of-the-box request transformers](#out-of-the-box-request-transformers)
-          - [makeRequestTransformer](#makerequesttransformer)
       - [Response transformers](#response-transformers)
     - [Body](#body)
     - [Query](#query)
@@ -243,6 +242,27 @@ const response = await service.get("/users")
 ```
 
 ##### Out-of-the-box request transformers
+
+###### kebabRequest
+Transforms all keys of the request's `query` and `body` to kebab-case.
+
+```ts
+const service = makeService('https://api.com', { requestTransformer: kebabRequest })
+```
+
+###### snakeRequest
+Transforms all keys of the request's `query` and `body` to snake_case.
+
+```ts
+const service = makeService('https://api.com', { requestTransformer: snakeRequest })
+```
+
+###### camelRequest
+Transforms all keys of the request's `query` and `body` to camelCase.
+
+```ts
+const service = makeService('https://api.com', { requestTransformer: camelRequest })
+```
 
 ###### makeRequestTransformer
 Creates a requestTransformer to use with makeService or makeFetcher that will deeply transform the keys of the query and the body of the request. This is used behind the scenes by all other included request transformers.
