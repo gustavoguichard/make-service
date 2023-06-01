@@ -40,6 +40,8 @@ const users = await response.json(usersSchema);
     - [Base URL](#base-url)
     - [Transformers](#transformers)
       - [Request transformers](#request-transformers)
+        - [Out-of-the-box request transformers](#out-of-the-box-request-transformers)
+          - [makeRequestTransformer](#makerequesttransformer)
       - [Response transformers](#response-transformers)
     - [Body](#body)
     - [Query](#query)
@@ -238,6 +240,20 @@ const service = makeService('https://example.com/api', {
 const response = await service.get("/users")
 
 // It will call "https://example.com/api/users?admin=true"
+```
+
+##### Out-of-the-box request transformers
+
+###### makeRequestTransformer
+Creates a requestTransformer to use with makeService or makeFetcher that will deeply transform the keys of the query and the body of the request. This is used behind the scenes by all other included request transformers.
+
+```ts
+const requestTransformer = makeRequestTransformer((key) =>
+  key.toUpperCase(),
+)
+
+const service = makeService('https://api.com', { requestTransformer })
+// This will uppercase all keys of a request's query and body
 ```
 
 #### Response transformers
