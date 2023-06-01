@@ -6,7 +6,7 @@ It adds a set of little features and allows you to parse responses with [zod](ht
 
 ## Features
 - 🤩 Type-safe return of `response.json()` and `response.text()`. Defaults to `unknown` instead of `any`.
-- 🚦 Easily setup an API with a `baseURL` and common `headers` for every request.
+- 🚦 Easily setup an API with a `baseURL` and common options like `headers` for every request.
 - 🏗️ Compose URL from the base by just calling the endpoints and an object-like `query`.
 - 🐾 Replaces URL wildcards with a **strongly-typed** object of `params`.
 - 🧙‍♀️ Automatically stringifies the `body` of a request so you can give it a JSON-like structure.
@@ -17,7 +17,9 @@ It adds a set of little features and allows you to parse responses with [zod](ht
 
 ```ts
 const service = makeService("https://example.com/api", {
-  Authorization: "Bearer 123",
+  headers: {
+    Authorization: "Bearer 123",
+  },
 });
 
 const response = await service.get("/users")
@@ -33,9 +35,12 @@ const users = await response.json(usersSchema);
     - [Runtime type-checking and parsing the response body](#runtime-type-checking-and-parsing-the-response-body)
     - [Supported HTTP Verbs](#supported-http-verbs)
     - [Headers](#headers)
-      - [Passing a function as `baseHeaders`](#passing-a-function-as-baseheaders)
+      - [Passing a function as `headers`](#passing-a-function-as-headers)
       - [Deleting a previously set header](#deleting-a-previously-set-header)
     - [Base URL](#base-url)
+    - [Transformers](#transformers)
+      - [Request transformers](#request-transformers)
+      - [Response transformers](#response-transformers)
     - [Body](#body)
     - [Query](#query)
     - [Params](#params)
@@ -68,7 +73,7 @@ import { makeService } from "https://deno.land/x/make_service/mod.ts";
 This library exports the `makeService` function and some primitives used to build it. You can use the primitives as you wish but the `makeService` will have all the features combined.
 
 ## makeService
-The main function of this lib is built on top of the primitives described in the following sections. It allows you to create a service object with a `baseURL` and common `headers` for every request.
+The main function of this lib is built on top of the primitives described in the following sections. It allows you to create a service object with a `baseURL` and common options like `headers` for every request.
 
 This service object can be called with every HTTP method and it will return a [`typedResponse`](#typedresponse).
 
@@ -76,7 +81,9 @@ This service object can be called with every HTTP method and it will return a [`
 import { makeService } from 'make-service'
 
 const service = makeService("https://example.com/api", {
-  authorization: "Bearer 123"
+  headers :{
+    authorization: "Bearer 123",
+  },
 })
 
 const response = await service.get("/users")
@@ -146,15 +153,17 @@ await service.options("/users")
 
 ### Headers
 The `headers` argument can be a `Headers` object, a `Record<string, string>`, or an array of `[key, value]` tuples (entries).
-The `baseHeaders` and the `headers` will be merged together, with the `headers` taking precedence.
+The `headers` option on `baseOptions` and the `headers` argument will be merged together, with the `headers` argument taking precedence.
 
 ```ts
 import { makeService } from 'make-service'
 
-const service = makeService("https://example.com/api", new Headers({
-  authorization: "Bearer 123",
-  accept: "*/*",
-}))
+const service = makeService("https://example.com/api", {
+  headers: new Headers({
+    authorization: "Bearer 123",
+    accept: "*/*",
+  }),
+})
 
 const response = await service.get("/users", {
   headers: [['accept', 'application/json']],
@@ -164,8 +173,8 @@ const response = await service.get("/users", {
 // with headers: { authorization: "Bearer 123", accept: "application/json" }
 ```
 
-#### Passing a function as `baseHeaders`
-The given `baseHeaders` can be a sync or async function that will run in every request before it gets merged with the other headers.
+#### Passing a function as `headers`
+The `headers` option on `baseOptions` can be a sync or async function that will run in every request before it gets merged with the other headers.
 This is particularly useful when you need to send a refreshed token or add a timestamp to the request.
 
 ```ts
@@ -173,16 +182,21 @@ import { makeService } from 'make-service'
 
 declare getAuthorizationToken: () => Promise<HeadersInit>
 
-const service = makeService("https://example.com/api", async () => ({
-  authorization: await getAuthorizationToken(),
-}))
+const service = makeService("https://example.com/api", {
+  headers: async () => ({
+    authorization: await getAuthorizationToken(),
+  }),
+})
 
 ```
 
 #### Deleting a previously set header
 In case you want to delete a header previously set you can pass `undefined` or `'undefined'` as its value:
 ```ts
-const service = makeService("https://example.com/api", { authorization: "Bearer 123" })
+const service = makeService("https://example.com/api", {
+  headers: { authorization: "Bearer 123" },
+})
+
 const response = await service.get("/users", {
   headers: new Headers({ authorization: 'undefined', "Content-Type": undefined }),
 })
@@ -209,6 +223,35 @@ const response = await service.get("/users?admin=true")
 // It will call "https://example.com/api/users?admin=true"
 ```
 You can use the [`makeGetApiUrl`](#makegetapiurl) method to do that kind of URL composition.
+
+### Transformers
+`makeService` can also receive `requestTransformer` and `responseTransformer` as options that will be applied to all requests.
+
+#### Request transformers
+You can transform the request in any way you want, like:
+
+```ts
+const service = makeService('https://example.com/api', {
+  requestTransformer: (request) => ({ ...request, query: { admin: 'true' } }),
+})
+
+const response = await service.get("/users")
+
+// It will call "https://example.com/api/users?admin=true"
+```
+
+#### Response transformers
+You can also transform the response in any way you want, like:
+
+```ts
+const service = makeService('https://example.com/api', {
+  responseTransformer: (response) => ({ ...response, statusText: 'It worked!' }),
+})
+
+const response = await service.get("/users")
+
+// response.statusText will be 'It worked!'
+```
 
 ### Body
 The function can also receive a `body` object that will be stringified and sent as the request body:

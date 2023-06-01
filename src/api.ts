@@ -8,11 +8,14 @@ import {
   replaceURLParams,
 } from './primitives'
 import {
+  BaseOptions,
   EnhancedRequestInit,
   HTTPMethod,
   ServiceRequestInit,
   TypedResponse,
 } from './types'
+
+const identity = <T>(value: T) => value
 
 /**
  * It hacks the Response object to add typed json and text methods
@@ -88,25 +91,28 @@ async function enhancedFetch<T extends string | URL>(
  * const users = await response.json(userSchema);
  * //    ^? User[]
  */
-function makeFetcher(
-  baseURL: string | URL,
-  baseHeaders?: HeadersInit | (() => HeadersInit | Promise<HeadersInit>),
-) {
+function makeFetcher(baseURL: string | URL, baseOptions: BaseOptions = {}) {
   return async <T extends string>(
     path: T,
     requestInit: EnhancedRequestInit<T> = {},
   ) => {
-    const url = makeGetApiURL(baseURL)(path)
-    const response = await enhancedFetch(url, {
-      ...requestInit,
+    const { headers } = baseOptions
+    const requestTransformer = baseOptions.requestTransformer ?? identity
+    const responseTransformer = baseOptions.responseTransformer ?? identity
+    const headerTransformer = async (ri: EnhancedRequestInit) => ({
+      ...ri,
       headers: mergeHeaders(
-        typeof baseHeaders === 'function'
-          ? await baseHeaders()
-          : baseHeaders ?? {},
+        typeof headers === 'function' ? await headers() : headers ?? {},
         requestInit?.headers ?? {},
       ),
     })
-    return response
+
+    const url = makeGetApiURL(baseURL)(path)
+    const response = await enhancedFetch(
+      url,
+      await headerTransformer(await requestTransformer(requestInit)),
+    )
+    return responseTransformer(response)
   }
 }
 
@@ -121,11 +127,8 @@ function makeFetcher(
  * const users = await response.json(userSchema);
  * //    ^? User[]
  */
-function makeService(
-  baseURL: string | URL,
-  baseHeaders?: HeadersInit | (() => HeadersInit | Promise<HeadersInit>),
-) {
-  const fetcher = makeFetcher(baseURL, baseHeaders)
+function makeService(baseURL: string | URL, baseOptions?: BaseOptions) {
+  const fetcher = makeFetcher(baseURL, baseOptions)
 
   function appliedService(method: HTTPMethod) {
     return async <T extends string>(

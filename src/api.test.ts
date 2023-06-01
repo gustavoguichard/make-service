@@ -212,7 +212,7 @@ describe('enhancedFetch', () => {
 })
 
 describe('makeFetcher', () => {
-  it('should return a applied enhancedFetch', async () => {
+  it('should return an applied enhancedFetch', async () => {
     vi.spyOn(global, 'fetch').mockImplementationOnce(
       successfulFetch({ foo: 'bar' }),
     )
@@ -234,9 +234,55 @@ describe('makeFetcher', () => {
       successfulFetch({ foo: 'bar' }),
     )
     const fetcher = subject.makeFetcher('https://example.com/api', {
-      Authorization: 'Bearer 123',
+      headers: {
+        Authorization: 'Bearer 123',
+      },
     })
     await fetcher('/users')
+    expect(reqMock).toHaveBeenCalledWith({
+      url: 'https://example.com/api/users',
+      headers: new Headers({
+        authorization: 'Bearer 123',
+        'content-type': 'application/json',
+      }),
+    })
+  })
+
+  it('should transform the request', async () => {
+    vi.spyOn(global, 'fetch').mockImplementationOnce(
+      successfulFetch({ foo: 'bar' }),
+    )
+    const fetcher = subject.makeFetcher('https://example.com/api', {
+      headers: {
+        Authorization: 'Bearer 123',
+      },
+      requestTransformer: (request) => ({ ...request, query: { foo: 'bar' } }),
+    })
+    await fetcher('/users')
+    expect(reqMock).toHaveBeenCalledWith({
+      url: 'https://example.com/api/users?foo=bar',
+      headers: new Headers({
+        authorization: 'Bearer 123',
+        'content-type': 'application/json',
+      }),
+    })
+  })
+
+  it('should transform the response', async () => {
+    vi.spyOn(global, 'fetch').mockImplementationOnce(
+      successfulFetch({ foo: 'bar' }),
+    )
+    const fetcher = subject.makeFetcher('https://example.com/api', {
+      headers: {
+        Authorization: 'Bearer 123',
+      },
+      responseTransformer: (response) => ({
+        ...response,
+        statusText: 'Foo Bar',
+      }),
+    })
+    const response = await fetcher('/users')
+    expect(response.statusText).toEqual('Foo Bar')
     expect(reqMock).toHaveBeenCalledWith({
       url: 'https://example.com/api/users',
       headers: new Headers({
@@ -268,9 +314,11 @@ describe('makeFetcher', () => {
     vi.spyOn(global, 'fetch').mockImplementationOnce(
       successfulFetch({ foo: 'bar' }),
     )
-    const fetcher = subject.makeFetcher('https://example.com/api', () => ({
-      Authorization: 'Bearer 123',
-    }))
+    const fetcher = subject.makeFetcher('https://example.com/api', {
+      headers: () => ({
+        Authorization: 'Bearer 123',
+      }),
+    })
     await fetcher('/users')
     expect(reqMock).toHaveBeenCalledWith({
       url: 'https://example.com/api/users',
@@ -285,12 +333,11 @@ describe('makeFetcher', () => {
     vi.spyOn(global, 'fetch').mockImplementationOnce(
       successfulFetch({ foo: 'bar' }),
     )
-    const fetcher = subject.makeFetcher(
-      'https://example.com/api',
-      async () => ({
+    const fetcher = subject.makeFetcher('https://example.com/api', {
+      headers: async () => ({
         Authorization: 'Bearer 123',
       }),
-    )
+    })
     await fetcher('/users')
     expect(reqMock).toHaveBeenCalledWith({
       url: 'https://example.com/api/users',
