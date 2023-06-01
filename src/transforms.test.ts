@@ -361,3 +361,42 @@ describe('makeResponseTransformer', () => {
     })
   })
 })
+
+describe('kebabResponse', () => {
+  test('with query and body objects', async () => {
+    const body = { some: { deepNested: { value: true } }, otherValue: true }
+    const original = typedResponse(new Response(JSON.stringify(body)))
+    const response = await subject.kebabResponse(original)
+
+    expect(await response.json()).toEqual({
+      some: { 'deep-nested': { value: true } },
+      'other-value': true,
+    })
+  })
+})
+
+describe('snakeResponse', () => {
+  test('with query and body objects', async () => {
+    const body = { some: { deepNested: { value: true } }, otherValue: true }
+    const original = typedResponse(new Response(JSON.stringify(body)))
+    const response = await subject.snakeResponse(original)
+
+    expect(await response.json()).toEqual({
+      some: { deep_nested: { value: true } },
+      other_value: true,
+    })
+  })
+})
+
+describe('camelResponse', () => {
+  test('with query and body objects', async () => {
+    const body = { some: { deep_nested: { value: true } }, other_value: true }
+    const original = typedResponse(new Response(JSON.stringify(body)))
+    const response = await subject.camelResponse(original)
+
+    expect(await response.json()).toEqual({
+      some: { deepNested: { value: true } },
+      otherValue: true,
+    })
+  })
+})

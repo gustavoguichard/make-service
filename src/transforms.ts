@@ -259,6 +259,10 @@ function makeResponseTransformer(
   return (response) => typedResponse(response, { getJson })
 }
 
+const kebabResponse = makeResponseTransformer(toKebabCase)
+const snakeResponse = makeResponseTransformer(toSnakeCase)
+const camelResponse = makeResponseTransformer(toCamelCase)
+
 export type {
   CamelToKebab,
   CamelToSnake,
@@ -285,5 +289,8 @@ export {
   snakeRequest,
   camelRequest,
   makeRequestTransformer,
+  kebabResponse,
+  snakeResponse,
+  camelResponse,
   makeResponseTransformer,
 }
