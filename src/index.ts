@@ -27,6 +27,9 @@ export type {
   KebabToSnake,
   SnakeToCamel,
   SnakeToKebab,
+  kebabRequest,
+  snakeRequest,
+  camelRequest,
   makeRequestTransformer,
 } from './transforms'
 export type * from './types'
