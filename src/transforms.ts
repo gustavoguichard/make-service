@@ -235,6 +235,17 @@ const kebabRequest = makeRequestTransformer(toKebabCase)
 const snakeRequest = makeRequestTransformer(toSnakeCase)
 const camelRequest = makeRequestTransformer(toCamelCase)
 
+/**
+ * Creates a responseTransformer to use with makeService or makeFetcher that
+ * will deeply transform the keys of the JSON body of the response.
+ * @param transformKey a function that receives a key and transforms it
+ * @returns a ResponseTransformer function
+ * @example const responseTransformer = makeResponseTransformer((key) =>
+ *   key.toUpperCase(),
+ * )
+ * const service = makeService('https://api.com', { responseTransformer })
+ * // This will uppercase all keys of the response's JSON body
+ */
 function makeResponseTransformer(
   transformKey: (str: string) => string,
 ): ResponseTransformer {
