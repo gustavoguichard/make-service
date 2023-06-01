@@ -245,4 +245,34 @@ describe('makeRequestTransformer', () => {
 
     expect(requestInit.body).toEqual(formData)
   })
+
+  test('with ReadableStream body', () => {
+    const transformer = subject.makeRequestTransformer((key) =>
+      key.toUpperCase(),
+    )
+
+    const body = new ReadableStream()
+    const requestInit = transformer({ body })
+    expect(requestInit.body).toEqual(body)
+  })
+
+  test('with Blob body', () => {
+    const transformer = subject.makeRequestTransformer((key) =>
+      key.toUpperCase(),
+    )
+
+    const body = new Blob()
+    const requestInit = transformer({ body })
+    expect(requestInit.body).toEqual(body)
+  })
+
+  test('with ArrayBuffer body', () => {
+    const transformer = subject.makeRequestTransformer((key) =>
+      key.toUpperCase(),
+    )
+
+    const body = new ArrayBuffer(1)
+    const requestInit = transformer({ body })
+    expect(requestInit.body).toEqual(body)
+  })
 })

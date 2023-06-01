@@ -157,7 +157,7 @@ function transformFormData(
   return transformed
 }
 
-function transformURLSearchParams(
+function transformSearchParams(
   searchParams: URLSearchParams,
   transformKey: (str: string) => string,
 ) {
@@ -177,12 +177,12 @@ function transformQuery(
   }
 
   if (query instanceof URLSearchParams) {
-    return transformURLSearchParams(query, transformKey)
+    return transformSearchParams(query, transformKey)
   }
 
   if (typeof query === 'string') {
     const searchParams = new URLSearchParams(query)
-    return transformURLSearchParams(searchParams, transformKey).toString()
+    return transformSearchParams(searchParams, transformKey).toString()
   }
 
   if (typeof query === 'object') return deepTransformKeys(query, transformKey)
@@ -195,16 +195,14 @@ function transformBody(
   transformKey: (str: string) => string,
 ) {
   if (body instanceof URLSearchParams) {
-    return transformURLSearchParams(body, transformKey)
+    return transformSearchParams(body, transformKey)
   }
 
   if (body instanceof FormData) {
     return transformFormData(body, transformKey)
   }
 
-  if (typeof body === 'object') return deepTransformKeys(body, transformKey)
-
-  return body
+  return deepTransformKeys(body, transformKey)
 }
 
 function makeRequestTransformer(
