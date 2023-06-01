@@ -276,3 +276,51 @@ describe('makeRequestTransformer', () => {
     expect(requestInit.body).toEqual(body)
   })
 })
+
+describe('kebabRequest', () => {
+  test('with query and body objects', async () => {
+    const requestInit = await subject.kebabRequest({
+      query: { myQuery: 'foo' },
+      body: { some: { deepNested: { value: true } }, otherValue: true },
+    })
+
+    expect(requestInit.body).toEqual({
+      some: { 'deep-nested': { value: true } },
+      'other-value': true,
+    })
+
+    expect(requestInit.query).toEqual({ 'my-query': 'foo' })
+  })
+})
+
+describe('snakeRequest', () => {
+  test('with query and body objects', async () => {
+    const requestInit = await subject.snakeRequest({
+      query: { myQuery: 'foo' },
+      body: { some: { deepNested: { value: true } }, otherValue: true },
+    })
+
+    expect(requestInit.body).toEqual({
+      some: { deep_nested: { value: true } },
+      other_value: true,
+    })
+
+    expect(requestInit.query).toEqual({ my_query: 'foo' })
+  })
+})
+
+describe('camelRequest', () => {
+  test('with query and body objects', async () => {
+    const requestInit = await subject.camelRequest({
+      query: { my_query: 'foo' },
+      body: { some: { deep_nested: { value: true } }, other_value: true },
+    })
+
+    expect(requestInit.body).toEqual({
+      some: { deepNested: { value: true } },
+      otherValue: true,
+    })
+
+    expect(requestInit.query).toEqual({ myQuery: 'foo' })
+  })
+})

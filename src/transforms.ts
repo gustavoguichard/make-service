@@ -227,6 +227,10 @@ function makeRequestTransformer(
   }
 }
 
+const kebabRequest = makeRequestTransformer(toKebabCase)
+const snakeRequest = makeRequestTransformer(toSnakeCase)
+const camelRequest = makeRequestTransformer(toCamelCase)
+
 export type {
   CamelToKebab,
   CamelToSnake,
@@ -241,6 +245,7 @@ export type {
   SnakeToCamel,
   SnakeToKebab,
 }
+
 export {
   camelToKebab,
   camelToSnake,
@@ -248,5 +253,8 @@ export {
   kebabToSnake,
   snakeToCamel,
   snakeToKebab,
+  kebabRequest,
+  snakeRequest,
+  camelRequest,
   makeRequestTransformer,
 }
