@@ -49,8 +49,10 @@ type BaseOptions = {
 
 type HTTPMethod = (typeof HTTP_METHODS)[number]
 
-type TypedResponseJson = ReturnType<typeof getJson>
-type TypedResponseText = ReturnType<typeof getText>
+type GetJson = typeof getJson
+type GetText = typeof getText
+type TypedResponseJson = ReturnType<GetJson>
+type TypedResponseText = ReturnType<GetText>
 
 type Prettify<T> = {
   [K in keyof T]: T[K]
@@ -66,6 +68,8 @@ type ExtractPathParams<T extends string> =
 export type {
   EnhancedBodyInit,
   EnhancedRequestInit,
+  GetJson,
+  GetText,
   HTTPMethod,
   JSONValue,
   PathParams,

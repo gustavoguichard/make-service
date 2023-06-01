@@ -1,3 +1,5 @@
+import { z } from 'zod'
+import { typedResponse } from './api'
 import type * as Subject from './transforms'
 import * as subject from './transforms'
 
@@ -322,5 +324,40 @@ describe('camelRequest', () => {
     })
 
     expect(requestInit.query).toEqual({ myQuery: 'foo' })
+  })
+})
+
+describe('makeResponseTransformer', () => {
+  test('without a schema', async () => {
+    const transformer = subject.makeResponseTransformer((key) =>
+      key.toUpperCase(),
+    )
+
+    const body = { some: { deepNested: { value: true } }, otherValue: true }
+    const original = typedResponse(new Response(JSON.stringify(body)))
+    const response = await transformer(original)
+
+    expect(await response.json()).toEqual({
+      SOME: { DEEPNESTED: { VALUE: true } },
+      OTHERVALUE: true,
+    })
+  })
+
+  test('with a schema', async () => {
+    const transformer = subject.makeResponseTransformer((key) =>
+      key.toUpperCase(),
+    )
+
+    const body = { some: { deepNested: { value: true } }, otherValue: true }
+    const original = typedResponse(new Response(JSON.stringify(body)))
+    const response = await transformer(original)
+
+    const schema = z.object({
+      SOME: z.object({ DEEPNESTED: z.object({ VALUE: z.boolean() }) }),
+    })
+
+    expect(await response.json(schema)).toEqual({
+      SOME: { DEEPNESTED: { VALUE: true } },
+    })
   })
 })

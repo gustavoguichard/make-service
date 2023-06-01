@@ -1,7 +1,11 @@
+import { typedResponse } from './api'
 import { typeOf } from './internals'
 import type {
   EnhancedBodyInit,
+  GetJson,
   RequestTransformer,
+  ResponseTransformer,
+  Schema,
   SearchParams,
 } from './types'
 
@@ -231,6 +235,19 @@ const kebabRequest = makeRequestTransformer(toKebabCase)
 const snakeRequest = makeRequestTransformer(toSnakeCase)
 const camelRequest = makeRequestTransformer(toCamelCase)
 
+function makeResponseTransformer(
+  transformKey: (str: string) => string,
+): ResponseTransformer {
+  const getJson: GetJson =
+    (response) =>
+    async <T = unknown>(schema?: Schema<T>): Promise<T> => {
+      const json = deepTransformKeys(await response.json(), transformKey)
+      return schema ? schema.parse(json) : (json as T)
+    }
+
+  return (response) => typedResponse(response, { getJson })
+}
+
 export type {
   CamelToKebab,
   CamelToSnake,
@@ -257,4 +274,5 @@ export {
   snakeRequest,
   camelRequest,
   makeRequestTransformer,
+  makeResponseTransformer,
 }

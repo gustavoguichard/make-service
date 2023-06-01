@@ -10,9 +10,13 @@ import {
 import {
   BaseOptions,
   EnhancedRequestInit,
+  GetJson,
+  GetText,
   HTTPMethod,
   ServiceRequestInit,
   TypedResponse,
+  TypedResponseJson,
+  TypedResponseText,
 } from './types'
 
 const identity = <T>(value: T) => value
@@ -31,16 +35,22 @@ const identity = <T>(value: T) => value
  * const typedJson = await response.json<User[]>();
  * //    ^? User[]
  */
-function typedResponse(response: Response): TypedResponse {
+function typedResponse(
+  response: Response,
+  options?: { getJson?: GetJson; getText?: GetText },
+): TypedResponse {
+  const getJsonFn = options?.getJson ?? getJson
+  const getTextFn = options?.getText ?? getText
+
   return new Proxy(response, {
     get(target, prop) {
-      if (prop === 'json') return getJson(target)
-      if (prop === 'text') return getText(target)
+      if (prop === 'json') return getJsonFn(target)
+      if (prop === 'text') return getTextFn(target)
       return target[prop as keyof Response]
     },
   }) as Omit<Response, 'json' | 'text'> & {
-    json: ReturnType<typeof getJson>
-    text: ReturnType<typeof getText>
+    json: TypedResponseJson
+    text: TypedResponseText
   }
 }
 
