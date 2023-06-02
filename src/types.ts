@@ -32,14 +32,18 @@ type EnhancedRequestInit<T = string> = Omit<RequestInit, 'body' | 'method'> & {
 
 type ServiceRequestInit<T = string> = Omit<EnhancedRequestInit<T>, 'method'>
 
+type RequestTransformer = (
+  request: EnhancedRequestInit,
+) => EnhancedRequestInit | Promise<EnhancedRequestInit>
+
+type ResponseTransformer = (
+  response: TypedResponse,
+) => TypedResponse | Promise<TypedResponse>
+
 type BaseOptions = {
   headers?: HeadersInit | (() => HeadersInit | Promise<HeadersInit>)
-  requestTransformer?: (
-    request: EnhancedRequestInit,
-  ) => EnhancedRequestInit | Promise<EnhancedRequestInit>
-  responseTransformer?: (
-    response: TypedResponse,
-  ) => TypedResponse | Promise<TypedResponse>
+  requestTransformer?: RequestTransformer
+  responseTransformer?: ResponseTransformer
 }
 
 type HTTPMethod = (typeof HTTP_METHODS)[number]
@@ -78,4 +82,6 @@ export type {
   TypedResponse,
   TypedResponseJson,
   TypedResponseText,
+  RequestTransformer,
+  ResponseTransformer,
 }
