@@ -1,5 +1,4 @@
 import { HTTP_METHODS } from './constants'
-import { getJson, getText } from './internals'
 
 type Schema<T> = { parse: (d: unknown) => T }
 
@@ -35,14 +34,24 @@ type ServiceRequestInit<T = string> = Omit<EnhancedRequestInit<T>, 'method'>
 
 type BaseOptions = {
   headers?: HeadersInit | (() => HeadersInit | Promise<HeadersInit>)
-  requestTransformer?: (request: EnhancedRequestInit) => EnhancedRequestInit | Promise<EnhancedRequestInit>
-  responseTransformer?: (response: TypedResponse) => TypedResponse | Promise<TypedResponse>
+  requestTransformer?: (
+    request: EnhancedRequestInit,
+  ) => EnhancedRequestInit | Promise<EnhancedRequestInit>
+  responseTransformer?: (
+    response: TypedResponse,
+  ) => TypedResponse | Promise<TypedResponse>
 }
 
 type HTTPMethod = (typeof HTTP_METHODS)[number]
 
-type TypedResponseJson = ReturnType<typeof getJson>
-type TypedResponseText = ReturnType<typeof getText>
+type TypedResponseJson = <T = unknown>(schema?: Schema<T>) => Promise<T>
+
+type TypedResponseText = <T extends string = string>(
+  schema?: Schema<T>,
+) => Promise<T>
+
+type GetJson = (response: Response) => TypedResponseJson
+type GetText = (response: Response) => TypedResponseText
 
 type Prettify<T> = {
   [K in keyof T]: T[K]
@@ -57,6 +66,8 @@ type ExtractPathParams<T extends string> =
 
 export type {
   EnhancedRequestInit,
+  GetJson,
+  GetText,
   HTTPMethod,
   JSONValue,
   PathParams,
