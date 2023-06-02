@@ -8,5 +8,6 @@ export default defineConfig(() => ({
     maxConcurrency: 1,
     minThreads: 0,
     maxThreads: 1,
+    exclude: ['tsc', 'node_modules'],
   },
 }))
