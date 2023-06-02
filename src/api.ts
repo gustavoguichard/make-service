@@ -83,7 +83,10 @@ async function enhancedFetch<T extends string | URL>(
 /**
  *
  * @param baseURL the base URL to be fetched in every request
- * @param baseHeaders any headers that should be sent with every request
+ * @param baseOptions options that will be applied to all requests
+ * @param baseOptions.headers any headers that should be sent with every request
+ * @param baseOptions.requestTransformer a function that will transform the enhanced request init of every request
+ * @param baseOptions.responseTransformer a function that will transform the typed response of every request
  * @returns a function that receive a path and requestInit and return a serialized json response that can be typed or not.
  * @example const headers = { Authorization: "Bearer 123" }
  * const fetcher = makeFetcher("https://example.com/api", headers);
@@ -119,7 +122,10 @@ function makeFetcher(baseURL: string | URL, baseOptions: BaseOptions = {}) {
 /**
  *
  * @param baseURL the base URL to the API
- * @param baseHeaders any headers that should be sent with every request
+ * @param baseOptions options that will be applied to all requests
+ * @param baseOptions.headers any headers that should be sent with every request
+ * @param baseOptions.requestTransformer a function that will transform the enhanced request init of every request
+ * @param baseOptions.responseTransformer a function that will transform the typed response of every request
  * @returns a service object with HTTP methods that are functions that receive a path and requestInit and return a serialized json response that can be typed or not.
  * @example const headers = { Authorization: "Bearer 123" }
  * const api = makeService("https://example.com/api", headers);

@@ -240,6 +240,8 @@ const response = await service.get("/users")
 // It will call "https://example.com/api/users?admin=true"
 ```
 
+Please note that the `headers` option will be applied _after_ the request transformer runs. If you're using a request transformer, we recommend adding custom headers inside your transformer instead of using both options.
+
 #### Response transformers
 You can also transform the response in any way you want, like:
 
