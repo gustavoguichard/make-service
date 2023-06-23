@@ -11,7 +11,7 @@ It adds a set of little features and allows you to parse responses with [zod](ht
 - 🐾 Replaces URL wildcards with a **strongly-typed** object of `params`.
 - 🧙‍♀️ Automatically stringifies the `body` of a request so you can give it a JSON-like structure.
 - 🐛 Accepts a `trace` function for debugging.
-- 🔥 Transforms responses and payloads back and forth to support interchangeability of casing styles (kebab-case -> camelCase -> snake_case -> kebab-case).
+- 🔥 It can transform responses and payloads back and forth to (e.g.) support interchangeability of casing styles (kebab-case -> camelCase -> snake_case -> kebab-case).
 
 ## Example
 
@@ -48,7 +48,7 @@ const users = await response.json(usersSchema);
   - [makeFetcher](#makefetcher)
   - [enhancedFetch](#enhancedfetch)
   - [typedResponse](#typedresponse)
-- [Payload transformers](#payload-transformers)
+- [Transform the Payload](#transform-the-payload)
 - [Other available primitives](#other-available-primitives)
   - [addQueryToURL](#addquerytourl)
   - [ensureStringBody](#ensurestringbody)
@@ -437,33 +437,27 @@ const text = await response.text(z.string().email())
 //    ^? string
 ```
 
-# Payload transformers
-The `make-service` library has a few payload transformers that you can use to transform the request body before sending it or the response body after returning from the server.
+# Transform the payload
+The combination of `make-service` and [`string-ts`](https://github.com/gustavoguichard/string-ts) libraries makes it easy to work with APIs that follow a different convention for object key's casing, so you can transform the request body before sending it or the response body after returning from the server.
 The resulting type will be **properly typed** 🤩.
 ```ts
-import { makeService, kebabToCamel, camelToKebab } from 'make-service'
+import { makeService } from 'make-service'
+import { deepCamelKeys, deepKebabKeys } from 'string-ts'
 
 const service = makeService("https://example.com/api")
 const response = service.get("/users")
 const users = await response.json(
   z
     .array(z.object({ "first-name": z.string(), contact: z.object({ "home-address": z.string() }) }))
-    .transform(kebabToCamel)
+    .transform(deepCamelKeys)
 )
 console.log(users)
 //          ^? { firstName: string, contact: { homeAddress: string } }[]
 
-const body = camelToKebab({ firstName: "John", contact: { homeAddress: "123 Main St" } })
+const body = deepKebabKeys({ firstName: "John", contact: { homeAddress: "123 Main St" } })
 //    ^? { "first-name": string, contact: { "home-address": string } }
 service.patch("/users/:id", { body, params: { id: "1" } })
 ```
-The available transformations are:
-- `camelToKebab`: `"someProp" -> "some-prop"`
-- `camelToSnake`: `"someProp" -> "some_prop"`
-- `kebabToCamel`: `"some-prop" -> "someProp"`
-- `kebabToSnake`: `"some-prop" -> "some_prop"`
-- `snakeToCamel`: `"some_prop" -> "someProp"`
-- `snakeToKebab`: `"some_prop" -> "some-prop"`
 
 # Other available primitives
 This little library has plenty of other useful functions that you can use to build your own services and interactions with external APIs.
