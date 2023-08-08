@@ -153,7 +153,7 @@ function makeService(baseURL: string | URL, baseOptions?: BaseOptions) {
     ) => fetcher(path, { ...requestInit, method })
   }
 
-  let service = {} as Record<
+  const service = {} as Record<
     Lowercase<HTTPMethod>,
     ReturnType<typeof appliedService>
   >
