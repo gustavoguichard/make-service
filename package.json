@@ -15,6 +15,7 @@
     "test": "vitest run"
   },
   "devDependencies": {
+    "@typescript-eslint/eslint-plugin": "^6.3.0",
     "eslint": "latest",
     "jsdom": "^21.1.1",
     "prettier": "latest",
