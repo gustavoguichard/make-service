@@ -1,8 +1,8 @@
 import { HTTP_METHODS } from './constants'
 import * as subject from './api'
 import * as z from 'zod'
-import { HTTPMethod } from './types'
-import { kebabToCamel } from './transforms'
+import type { HTTPMethod } from './types'
+import { deepCamelKeys } from 'string-ts'
 
 const reqMock = vi.fn()
 function successfulFetch(response: string | Record<string, unknown>) {
@@ -108,7 +108,7 @@ describe('enhancedFetch', () => {
                 'deep-nested': z.object({ 'kind-of-value': z.boolean() }),
               }),
             })
-            .transform(kebabToCamel),
+            .transform(deepCamelKeys),
         ),
       )
     type _R = Expect<
@@ -127,7 +127,7 @@ describe('enhancedFetch', () => {
         params: {
           user: '1',
           page: '2',
-          // @ts-expect-error
+          // @ts-expect-error argument not infered from URL
           foo: 'bar',
         },
       },
@@ -300,7 +300,7 @@ describe('makeFetcher', () => {
     await fetcher('/users/:id', {
       params: {
         id: '1',
-        // @ts-expect-error
+        // @ts-expect-error argument not infered from URL
         foo: 'bar',
       },
     })
@@ -406,7 +406,7 @@ describe('makeService', () => {
     await service.get('/users/:id', {
       params: {
         id: '1',
-        // @ts-expect-error
+        // @ts-expect-error argument not infered from URL
         foo: 'bar',
       },
     })

@@ -1,5 +1,5 @@
 import { typeOf } from './internals'
-import { JSONValue, PathParams, SearchParams } from './types'
+import type { JSONValue, PathParams, SearchParams } from './types'
 
 /**
  * @param url a string or URL to which the query parameters will be added
@@ -99,7 +99,7 @@ function replaceURLParams<T extends string | URL>(
 
   let urlString = String(url)
   Object.entries(params).forEach(([key, value]) => {
-    urlString = urlString.replace(new RegExp(`:${key}($|\/)`), `${value}$1`)
+    urlString = urlString.replace(new RegExp(`:${key}($|/)`), `${value}$1`)
   })
   return (url instanceof URL ? new URL(urlString) : urlString) as T
 }

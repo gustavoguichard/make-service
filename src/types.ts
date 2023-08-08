@@ -1,4 +1,4 @@
-import { HTTP_METHODS } from './constants'
+import type { HTTP_METHODS } from './constants'
 
 type Schema<T> = { parse: (d: unknown) => T }
 

@@ -19,6 +19,7 @@
     "eslint": "latest",
     "jsdom": "^22.1.0",
     "prettier": "latest",
+    "string-ts": "^0.4.1",
     "tsup": "^6.7.0",
     "typescript": "^5.1.3",
     "vitest": "latest",
