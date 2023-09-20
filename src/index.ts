@@ -5,5 +5,6 @@ export {
   makeGetApiURL,
   mergeHeaders,
   replaceURLParams,
+  typeOf,
 } from './primitives'
 export type * from './types'

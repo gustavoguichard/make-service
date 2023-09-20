@@ -1,4 +1,3 @@
-import { typeOf } from './internals'
 import type { JSONValue, PathParams, SearchParams } from './types'
 
 /**
@@ -102,10 +101,39 @@ function replaceURLParams<T extends string | URL>(
   return (url instanceof URL ? new URL(urlString) : urlString) as T
 }
 
+/**
+ * This is an enhanced version of the typeof operator to check the type of more complex values.
+ * @param t the value to be checked
+ * @returns the type of the value
+ */
+function typeOf(t: unknown) {
+  return Object.prototype.toString
+    .call(t)
+    .replace(/^\[object (.+)\]$/, '$1')
+    .toLowerCase() as
+    | 'array'
+    | 'arraybuffer'
+    | 'bigint'
+    | 'blob'
+    | 'boolean'
+    | 'formdata'
+    | 'function'
+    | 'null'
+    | 'number'
+    | 'object'
+    | 'readablestream'
+    | 'string'
+    | 'symbol'
+    | 'undefined'
+    | 'url'
+    | 'urlsearchparams'
+}
+
 export {
   addQueryToURL,
   ensureStringBody,
   makeGetApiURL,
   mergeHeaders,
   replaceURLParams,
+  typeOf,
 }
