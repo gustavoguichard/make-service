@@ -16,13 +16,17 @@ describe('addQueryToURL', () => {
 
   it('should add the query object to a URL input', () => {
     expect(
-      subject.addQueryToURL(new URL('https://example.com/api'), {
-        id: '1',
-      }),
-    ).toEqual(new URL('https://example.com/api?id=1'))
+      subject
+        .addQueryToURL(new URL('https://example.com/api'), {
+          id: '1',
+        })
+        .toString(),
+    ).toEqual(new URL('https://example.com/api?id=1').toString())
     expect(
-      subject.addQueryToURL(new URL('https://example.com/api'), 'page=2'),
-    ).toEqual(new URL('https://example.com/api?page=2'))
+      subject
+        .addQueryToURL(new URL('https://example.com/api'), 'page=2')
+        .toString(),
+    ).toEqual(new URL('https://example.com/api?page=2').toString())
   })
 
   it('should append the query to a URL string that already has QS', () => {
@@ -42,19 +46,25 @@ describe('addQueryToURL', () => {
 
   it('should append the query to a URL instance that already has QS', () => {
     expect(
-      subject.addQueryToURL(new URL('https://example.com/api?id=1'), {
-        page: '2',
-      }),
-    ).toEqual(new URL('https://example.com/api?id=1&page=2'))
+      subject
+        .addQueryToURL(new URL('https://example.com/api?id=1'), {
+          page: '2',
+        })
+        .toString(),
+    ).toEqual(new URL('https://example.com/api?id=1&page=2').toString())
     expect(
-      subject.addQueryToURL(new URL('https://example.com/api?id=1'), 'page=2'),
-    ).toEqual(new URL('https://example.com/api?id=1&page=2'))
+      subject
+        .addQueryToURL(new URL('https://example.com/api?id=1'), 'page=2')
+        .toString(),
+    ).toEqual(new URL('https://example.com/api?id=1&page=2').toString())
     expect(
-      subject.addQueryToURL(
-        new URL('https://example.com/api?id=1'),
-        new URLSearchParams({ page: '2' }),
-      ),
-    ).toEqual(new URL('https://example.com/api?id=1&page=2'))
+      subject
+        .addQueryToURL(
+          new URL('https://example.com/api?id=1'),
+          new URLSearchParams({ page: '2' }),
+        )
+        .toString(),
+    ).toEqual(new URL('https://example.com/api?id=1&page=2').toString())
   })
 
   it("should return the input in case there's no query", () => {
