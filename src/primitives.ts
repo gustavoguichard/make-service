@@ -17,9 +17,7 @@ function addQueryToURL(
     return `${url}${separator}${new URLSearchParams(searchParams)}`
   }
   if (searchParams && url instanceof URL) {
-    for (const [key, value] of Object.entries(
-      new URLSearchParams(searchParams),
-    )) {
+    for (const [key, value] of new URLSearchParams(searchParams).entries()) {
       url.searchParams.set(key, value)
     }
   }
