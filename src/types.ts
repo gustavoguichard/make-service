@@ -6,8 +6,9 @@ type JSONValue =
   | string
   | number
   | boolean
-  | { [x: string]: JSONValue }
-  | Array<JSONValue>
+  | Date // Will be turned into a string
+  | { [x: string]: JSONValue | undefined | null }
+  | Array<JSONValue | undefined | null>
 
 type SearchParams = ConstructorParameters<typeof URLSearchParams>[0]
 
