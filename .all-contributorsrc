@@ -37,7 +37,8 @@
         "code",
         "promotion",
         "ideas",
-        "doc"
+        "doc",
+        "bug"
       ]
     }
   ]
