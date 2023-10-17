@@ -4,3 +4,4 @@ dist/
 npm
 tsc/
 .DS_Store
+.idea
