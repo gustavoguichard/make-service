@@ -589,6 +589,13 @@ The params will be **strongly-typed** which means they will be validated against
 <!-- ALL-CONTRIBUTORS-LIST:START - Do not remove or modify this section -->
 <!-- prettier-ignore-start -->
 <!-- markdownlint-disable -->
+<table>
+  <tbody>
+    <tr>
+      <td align="center" valign="top" width="14.28%"><a href="https://www.linkedin.com/in/danielweinmann"><img src="https://avatars.githubusercontent.com/u/204765?v=4?s=100" width="100px;" alt="Daniel Weinmann"/><br /><sub><b>Daniel Weinmann</b></sub></a><br /><a href="#code-danielweinmann" title="Code">💻</a> <a href="#promotion-danielweinmann" title="Promotion">📣</a> <a href="#ideas-danielweinmann" title="Ideas, Planning, & Feedback">🤔</a> <a href="#doc-danielweinmann" title="Documentation">📖</a></td>
+    </tr>
+  </tbody>
+</table>
 
 <!-- markdownlint-restore -->
 <!-- prettier-ignore-end -->
