@@ -9,6 +9,26 @@
   "contributorsPerLine": 7,
   "contributors": [
     {
+      "login": "gustavoguichard",
+      "name": "Guga Guichard",
+      "avatar_url": "https://avatars.githubusercontent.com/u/566971?v=4",
+      "profile": "https://github.com/gustavoguichard",
+      "contributions": [
+        "code",
+        "projectManagement",
+        "promotion",
+        "maintenance",
+        "doc",
+        "bug",
+        "infra",
+        "question",
+        "research",
+        "review",
+        "ideas",
+        "example"
+      ]
+    },
+    {
       "login": "danielweinmann",
       "name": "Daniel Weinmann",
       "avatar_url": "https://avatars.githubusercontent.com/u/204765?v=4",
