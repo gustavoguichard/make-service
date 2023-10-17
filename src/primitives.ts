@@ -5,15 +5,15 @@ import type { JSONValue, PathParams, SearchParams } from './types'
  * @param searchParams the query parameters
  * @returns the url with the query parameters added with the same type as the url
  */
-function addQueryToURL(
-  url: string | URL,
+function addQueryToURL<T extends string | URL>(
+  url: T,
   searchParams?: SearchParams,
-): string | URL {
+): T {
   if (!searchParams) return url
 
   if (typeof url === 'string') {
     const separator = url.includes('?') ? '&' : '?'
-    return `${url}${separator}${new URLSearchParams(searchParams)}`
+    return `${url}${separator}${new URLSearchParams(searchParams)}` as T
   }
   if (searchParams && url instanceof URL) {
     for (const [key, value] of new URLSearchParams(searchParams).entries()) {
