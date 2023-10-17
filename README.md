@@ -589,6 +589,13 @@ The params will be **strongly-typed** which means they will be validated against
 <!-- ALL-CONTRIBUTORS-LIST:START - Do not remove or modify this section -->
 <!-- prettier-ignore-start -->
 <!-- markdownlint-disable -->
+<table>
+  <tbody>
+    <tr>
+      <td align="center" valign="top" width="14.28%"><a href="https://github.com/gustavoguichard"><img src="https://avatars.githubusercontent.com/u/566971?v=4?s=100" width="100px;" alt="Guga Guichard"/><br /><sub><b>Guga Guichard</b></sub></a><br /><a href="#code-gustavoguichard" title="Code">💻</a> <a href="#projectManagement-gustavoguichard" title="Project Management">📆</a> <a href="#promotion-gustavoguichard" title="Promotion">📣</a> <a href="#maintenance-gustavoguichard" title="Maintenance">🚧</a> <a href="#doc-gustavoguichard" title="Documentation">📖</a> <a href="#bug-gustavoguichard" title="Bug reports">🐛</a> <a href="#infra-gustavoguichard" title="Infrastructure (Hosting, Build-Tools, etc)">🚇</a> <a href="#question-gustavoguichard" title="Answering Questions">💬</a> <a href="#research-gustavoguichard" title="Research">🔬</a> <a href="#review-gustavoguichard" title="Reviewed Pull Requests">👀</a> <a href="#ideas-gustavoguichard" title="Ideas, Planning, & Feedback">🤔</a> <a href="#example-gustavoguichard" title="Examples">💡</a></td>
+    </tr>
+  </tbody>
+</table>
 
 <!-- markdownlint-restore -->
 <!-- prettier-ignore-end -->
