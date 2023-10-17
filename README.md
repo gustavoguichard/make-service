@@ -1,3 +1,7 @@
+[![NPM](https://img.shields.io/npm/v/make-service)](https://www.npmjs.org/package/make-service)
+![Library size](https://img.shields.io/bundlephobia/minzip/make-service)
+[![All Contributors](https://img.shields.io/github/all-contributors/gustavoguichard/make-service?color=0375b6&style=flat-square)](#contributors)
+
 # make-service
 
 A type-safe thin wrapper around the `fetch` API to better interact with external APIs.
@@ -579,6 +583,17 @@ const url = replaceURLParams(
 ```
 
 The params will be **strongly-typed** which means they will be validated against the URL structure and will not type-check if the given object does not match that structure.
+
+# Contributors
+
+<!-- ALL-CONTRIBUTORS-LIST:START - Do not remove or modify this section -->
+<!-- prettier-ignore-start -->
+<!-- markdownlint-disable -->
+
+<!-- markdownlint-restore -->
+<!-- prettier-ignore-end -->
+
+<!-- ALL-CONTRIBUTORS-LIST:END -->
 
 # Acknowledgements
 This library is part of a code I've been carrying around for a while through many projects.
