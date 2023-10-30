@@ -31,9 +31,9 @@
   ],
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/gugaguichard/make-service.git"
+    "url": "git+https://github.com/gustavoguichard/make-service.git"
   },
   "bugs": {
-    "url": "https://github.com/gugaguichard/make-service/issues"
+    "url": "https://github.com/gustavoguichard/make-service/issues"
   }
 }
