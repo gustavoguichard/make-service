@@ -1,6 +1,6 @@
 {
   "name": "make-service",
-  "version": "2.1.1",
+  "version": "2.1.2",
   "description": "Some utilities to extend the 'fetch' API to better interact with external APIs.",
   "main": "./dist/index.js",
   "module": "./dist/index.mjs",
