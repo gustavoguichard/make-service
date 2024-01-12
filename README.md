@@ -102,7 +102,6 @@ On the example above, the request will be sent with the following arguments:
 // {
 //   method: 'GET',
 //   headers: {
-//    'content-type': 'application/json',
 //    'authorization': 'Bearer 123',
 //   }
 // }
@@ -202,7 +201,7 @@ const service = makeService("https://example.com/api", {
 })
 
 const response = await service.get("/users", {
-  headers: new Headers({ authorization: 'undefined', "Content-Type": undefined }),
+  headers: new Headers({ authorization: 'undefined' }),
 })
 // headers will be empty.
 ```
@@ -344,7 +343,7 @@ const service = makeService("https://example.com/api")
 const response = await service.get("/users/:id", {
   params: { id: "2" },
   query: { page: "2"},
-  headers: { Accept: "application/json" },
+  headers: { Accept: "application/json", "Content-type": "application/json" },
   trace: (url, requestInit) => {
     console.log("The request was sent to " + url)
     console.log("with the following params: " + JSON.stringify(requestInit))
@@ -408,11 +407,8 @@ await enhancedFetch("https://example.com/api/users/:role", {
 // {
 //   method: 'POST',
 //   body: '{"some":{"object":{"as":{"body":{}}}}}',
-//   headers: { 'content-type': 'application/json' }
 // }
 ```
-
-Notice: the `enhancedFetch` adds a `'content-type': 'application/json'` header by default.
 
 ## typedResponse
 
