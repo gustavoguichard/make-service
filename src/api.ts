@@ -46,7 +46,7 @@ function typedResponse(
     get(target, prop) {
       if (prop === 'json') return getJsonFn(target)
       if (prop === 'text') return getTextFn(target)
-      return target[prop as keyof Response]
+      return Reflect.get(target, prop)
     },
   }) as Omit<Response, 'json' | 'text'> & {
     json: TypedResponseJson
