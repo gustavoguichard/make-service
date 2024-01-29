@@ -209,6 +209,12 @@ describe('enhancedFetch', () => {
       },
     )
   })
+
+  it('should return some result from other Response methods', async () => {
+    const response = await subject.enhancedFetch('data:text/plain;,foo')
+    const blob = await response.blob()
+    expect(await blob.text()).toEqual('foo')
+  })
 })
 
 describe('makeFetcher', () => {
