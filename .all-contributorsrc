@@ -42,6 +42,20 @@
       ]
     },
     {
+      "login": "iamandrewluca",
+      "name": "Andrei Luca",
+      "avatar_url": "https://avatars.githubusercontent.com/u/1881266?v=4",
+      "profile": "https://luca.md",
+      "contributions": [
+        "doc",
+        "code",
+        "promotion",
+        "maintenance",
+        "bug",
+        "ideas"
+      ]
+    },
+    {
       "login": "diogob",
       "name": "Diogo Biazus",
       "avatar_url": "https://avatars.githubusercontent.com/u/20662?v=4",
@@ -58,20 +72,6 @@
       "contributions": [
         "code",
         "bug"
-      ]
-    },
-    {
-      "login": "iamandrewluca",
-      "name": "Andrei Luca",
-      "avatar_url": "https://avatars.githubusercontent.com/u/1881266?v=4",
-      "profile": "https://luca.md",
-      "contributions": [
-        "doc",
-        "code",
-        "promotion",
-        "maintenance",
-        "bug",
-        "ideas"
       ]
     }
   ]
