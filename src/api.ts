@@ -117,6 +117,7 @@ function makeFetcher(baseURL: string | URL, baseOptions: BaseOptions = {}) {
       ...ri,
       headers: mergeHeaders(
         typeof headers === 'function' ? await headers() : headers ?? {},
+        ri.headers ?? {},
         requestInit?.headers ?? {},
       ),
     })
