@@ -80,17 +80,11 @@ async function enhancedFetch<T extends string | URL>(
   requestInit?: EnhancedRequestInit<T>,
 ) {
   const { query, trace, ...reqInit } = requestInit ?? {}
-  const headers = mergeHeaders(
-    {
-      'content-type': 'application/json',
-    },
-    reqInit.headers ?? {},
-  )
+  const body = ensureStringBody(reqInit.body)
   const withParams = replaceURLParams<T>(url, reqInit.params ?? ({} as never))
   const fullURL = addQueryToURL(withParams, query)
-  const body = ensureStringBody(reqInit.body)
 
-  const enhancedReqInit = { ...reqInit, headers, body }
+  const enhancedReqInit = { ...reqInit, body }
   trace?.(fullURL, enhancedReqInit)
   const response = await fetch(fullURL, enhancedReqInit)
 

@@ -134,9 +134,6 @@ describe('enhancedFetch', () => {
     )
     expect(reqMock).toHaveBeenCalledWith({
       url: 'https://example.com/api/users/1/page/2',
-      headers: new Headers({
-        'content-type': 'application/json',
-      }),
     })
   })
 
@@ -150,10 +147,7 @@ describe('enhancedFetch', () => {
     })
     expect(reqMock).toHaveBeenCalledWith({
       url: 'https://example.com/api/users?admin=true',
-      headers: new Headers({
-        authorization: 'Bearer 123',
-        'content-type': 'application/json',
-      }),
+      headers: { Authorization: 'Bearer 123' },
     })
   })
 
@@ -167,7 +161,6 @@ describe('enhancedFetch', () => {
     })
     expect(reqMock).toHaveBeenCalledWith({
       url: 'https://example.com/api/users',
-      headers: new Headers({ 'content-type': 'application/json' }),
       method: 'POST',
       body: `{"id":1,"name":{"first":"John","last":"Doe"}}`,
     })
@@ -183,7 +176,6 @@ describe('enhancedFetch', () => {
     })
     expect(reqMock).toHaveBeenCalledWith({
       url: 'https://example.com/api/users',
-      headers: new Headers({ 'content-type': 'application/json' }),
       method: 'POST',
       body: `{"id":1,"name":{"first":"John","last":"Doe"}}`,
     })
@@ -203,7 +195,6 @@ describe('enhancedFetch', () => {
     expect(trace).toHaveBeenCalledWith(
       'https://example.com/api/users?admin=true',
       {
-        headers: new Headers({ 'content-type': 'application/json' }),
         method: 'POST',
         body: `{"id":1,"name":{"first":"John","last":"Doe"}}`,
       },
@@ -227,11 +218,12 @@ describe('makeFetcher', () => {
       r.json(z.object({ foo: z.string() })),
     )
     type _R = Expect<Equal<typeof result, { foo: string }>>
+
     expect(result).toEqual({ foo: 'bar' })
     expect(reqMock).toHaveBeenCalledWith({
       url: 'https://example.com/api/users',
-      headers: new Headers({ 'content-type': 'application/json' }),
       method: 'post',
+      headers: new Headers(),
     })
   })
 
@@ -244,7 +236,7 @@ describe('makeFetcher', () => {
         Authorization: 'Bearer 123',
       },
     })
-    await fetcher('/users')
+    await fetcher('/users', { headers: { 'Content-type': 'application/json' } })
     expect(reqMock).toHaveBeenCalledWith({
       url: 'https://example.com/api/users',
       headers: new Headers({
@@ -267,10 +259,7 @@ describe('makeFetcher', () => {
     await fetcher('/users')
     expect(reqMock).toHaveBeenCalledWith({
       url: 'https://example.com/api/users?foo=bar',
-      headers: new Headers({
-        authorization: 'Bearer 123',
-        'content-type': 'application/json',
-      }),
+      headers: new Headers({ authorization: 'Bearer 123' }),
     })
   })
 
@@ -291,10 +280,7 @@ describe('makeFetcher', () => {
     expect(response.statusText).toEqual('Foo Bar')
     expect(reqMock).toHaveBeenCalledWith({
       url: 'https://example.com/api/users',
-      headers: new Headers({
-        authorization: 'Bearer 123',
-        'content-type': 'application/json',
-      }),
+      headers: new Headers({ authorization: 'Bearer 123' }),
     })
   })
 
@@ -312,7 +298,7 @@ describe('makeFetcher', () => {
     })
     expect(reqMock).toHaveBeenCalledWith({
       url: 'https://example.com/api/users/1',
-      headers: new Headers({ 'content-type': 'application/json' }),
+      headers: new Headers(),
     })
   })
 
@@ -328,10 +314,7 @@ describe('makeFetcher', () => {
     await fetcher('/users')
     expect(reqMock).toHaveBeenCalledWith({
       url: 'https://example.com/api/users',
-      headers: new Headers({
-        authorization: 'Bearer 123',
-        'content-type': 'application/json',
-      }),
+      headers: new Headers({ authorization: 'Bearer 123' }),
     })
   })
 
@@ -344,7 +327,9 @@ describe('makeFetcher', () => {
         Authorization: 'Bearer 123',
       }),
     })
-    await fetcher('/users')
+    await fetcher('/users', {
+      headers: new Headers({ 'content-type': 'application/json' }),
+    })
     expect(reqMock).toHaveBeenCalledWith({
       url: 'https://example.com/api/users',
       headers: new Headers({
@@ -369,9 +354,9 @@ describe('makeFetcher', () => {
     expect(trace).toHaveBeenCalledWith(
       'https://example.com/api/users?admin=true',
       {
-        headers: new Headers({ 'content-type': 'application/json' }),
         method: 'POST',
         body: `{"id":1,"name":{"first":"John","last":"Doe"}}`,
+        headers: new Headers(),
       },
     )
   })
@@ -396,11 +381,12 @@ describe('makeService', () => {
       .post('/users')
       .then((r) => r.json(z.object({ foo: z.string() })))
     type _R = Expect<Equal<typeof result, { foo: string }>>
+
     expect(result).toEqual({ foo: 'bar' })
     expect(reqMock).toHaveBeenCalledWith({
       url: 'https://example.com/api/users',
-      headers: new Headers({ 'content-type': 'application/json' }),
       method: 'POST',
+      headers: new Headers(),
     })
   })
 
@@ -418,8 +404,8 @@ describe('makeService', () => {
     })
     expect(reqMock).toHaveBeenCalledWith({
       url: 'https://example.com/api/users/1',
-      headers: new Headers({ 'content-type': 'application/json' }),
       method: 'GET',
+      headers: new Headers(),
     })
   })
 })
