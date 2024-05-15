@@ -227,6 +227,22 @@ describe('makeFetcher', () => {
     })
   })
 
+  it('should accept a timeout in ms', async () => {
+    vi.spyOn(global, 'fetch').mockImplementationOnce(
+      async (_input: URL | RequestInfo, _init?: RequestInit | undefined) => {
+        await new Promise((r) => setTimeout(r, 2000))
+        return new Response(JSON.stringify({ foo: 'bar' }))
+      },
+    )
+    const service = subject.makeFetcher('https://example.com/api', {
+      timeout: 1,
+    })
+    await expect(() =>
+      service('/users', { method: 'post' }).then((r) => r.json()),
+    ).rejects.toThrowError()
+    expect(reqMock).not.toHaveBeenCalled()
+  })
+
   it('should add headers to the request', async () => {
     vi.spyOn(global, 'fetch').mockImplementationOnce(
       successfulFetch({ foo: 'bar' }),

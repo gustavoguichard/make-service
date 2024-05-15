@@ -45,6 +45,7 @@ type BaseOptions = {
   headers?: HeadersInit | (() => HeadersInit | Promise<HeadersInit>)
   requestTransformer?: RequestTransformer
   responseTransformer?: ResponseTransformer
+  timeout?: number
 }
 
 type HTTPMethod = (typeof HTTP_METHODS)[number]

@@ -110,7 +110,7 @@ function makeFetcher(baseURL: string | URL, baseOptions: BaseOptions = {}) {
     path: T,
     requestInit: EnhancedRequestInit<T> = {},
   ) => {
-    const { headers } = baseOptions
+    const { headers, timeout } = baseOptions
     const requestTransformer = baseOptions.requestTransformer ?? identity
     const responseTransformer = baseOptions.responseTransformer ?? identity
     const headerTransformer = async (ri: EnhancedRequestInit) => ({
@@ -123,10 +123,25 @@ function makeFetcher(baseURL: string | URL, baseOptions: BaseOptions = {}) {
     })
 
     const url = makeGetApiURL(baseURL)(path)
-    const response = await enhancedFetch(
-      url,
-      await headerTransformer(await requestTransformer(requestInit)),
-    )
+    const fetchPromise = async () =>
+      enhancedFetch(
+        url,
+        await headerTransformer(await requestTransformer(requestInit)),
+      )
+
+    const throwOnTimeout = (timeout: number) =>
+      new Promise((_, reject) =>
+        setTimeout(
+          () => reject(new Error(`Timed out (${timeout}ms) fetching ${url}`)),
+          timeout,
+        ),
+      )
+
+    const response = (await (timeout == undefined
+      ? fetchPromise()
+      : Promise.race([fetchPromise(), throwOnTimeout(timeout)]))) as Awaited<
+      ReturnType<typeof fetchPromise>
+    >
     return responseTransformer(response)
   }
 }
