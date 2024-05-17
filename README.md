@@ -45,6 +45,7 @@ const users = await response.json(usersSchema);
     - [Transformers](#transformers)
       - [Request transformers](#request-transformers)
       - [Response transformers](#response-transformers)
+    - [Request timeout](#request-timeout)
     - [Body](#body)
     - [Query](#query)
     - [Params](#params)
@@ -256,6 +257,24 @@ const service = makeService('https://example.com/api', {
 const response = await service.get("/users")
 
 // response.statusText will be 'It worked!'
+```
+
+### Request timeout
+
+A single timeout based on the service can be very useful since the default fetch timeout is quite long.
+The `timeout` parameter accepts a number of milliseconds and abort any request that takes longer than that limit.
+
+Using an [AbortController](https://developer.mozilla.org/en-US/docs/Web/API/AbortController) for individual requests is still possible for more fine grained control.
+
+The example below will abort the request after 30 seconds rejecting the promise.
+
+```ts
+const service = makeService('https://example.com/api', {
+  timeout: 30000,
+})
+
+const response = await service.get("/users")
+
 ```
 
 ### Body
