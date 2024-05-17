@@ -98,6 +98,7 @@ async function enhancedFetch<T extends string | URL>(
  * @param baseOptions.headers any headers that should be sent with every request
  * @param baseOptions.requestTransformer a function that will transform the enhanced request init of every request
  * @param baseOptions.responseTransformer a function that will transform the typed response of every request
+ * @param baseOptions.timeout the maximum number of milliseconds any request is allowed before the promise is rejected.
  * @returns a function that receive a path and requestInit and return a serialized json response that can be typed or not.
  * @example const headers = { Authorization: "Bearer 123" }
  * const fetcher = makeFetcher("https://example.com/api", headers);
@@ -153,6 +154,7 @@ function makeFetcher(baseURL: string | URL, baseOptions: BaseOptions = {}) {
  * @param baseOptions.headers any headers that should be sent with every request
  * @param baseOptions.requestTransformer a function that will transform the enhanced request init of every request
  * @param baseOptions.responseTransformer a function that will transform the typed response of every request
+ * @param baseOptions.timeout the maximum number of milliseconds any request is allowed before the promise is rejected.
  * @returns a service object with HTTP methods that are functions that receive a path and requestInit and return a serialized json response that can be typed or not.
  * @example const headers = { Authorization: "Bearer 123" }
  * const api = makeService("https://example.com/api", headers);
