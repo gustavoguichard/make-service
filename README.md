@@ -525,7 +525,7 @@ You create a `getApiURL` function by giving it a `baseURL` and then it accepts a
 import { makeGetApiURL } from 'make-service'
 
 const getApiURL = makeGetApiURL("https://example.com/api")
-const url = getApiURL("/users?admin=true", { query: { page: "2" } })
+const url = getApiURL("/users?admin=true", { page: "2" })
 
 // "https://example.com/api/users?admin=true&page=2"
 ```
