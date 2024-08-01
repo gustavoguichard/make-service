@@ -30,8 +30,8 @@ type EnhancedRequestInit<T = string> = Omit<RequestInit, 'body' | 'method'> & {
   params?: PathParams<T>
   trace?: (
     input: Parameters<typeof fetch>[0],
-    init?: Parameters<typeof fetch>[1],
-    response?: Awaited<ReturnType<typeof fetch>>,
+    init: Parameters<typeof fetch>[1],
+    response: Awaited<ReturnType<typeof fetch>>,
   ) => void | Promise<void>
 }
 
