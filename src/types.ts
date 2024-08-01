@@ -28,7 +28,11 @@ type EnhancedRequestInit<T = string> = Omit<RequestInit, 'body' | 'method'> & {
   body?: JSONValue | BodyInit | null
   query?: SearchParams
   params?: PathParams<T>
-  trace?: (...args: Parameters<typeof fetch>) => void
+  trace?: (
+    input: Parameters<typeof fetch>[0],
+    init?: Parameters<typeof fetch>[1],
+    response?: Awaited<ReturnType<typeof fetch>>,
+  ) => void | Promise<void>
 }
 
 type ServiceRequestInit<T = string> = Omit<EnhancedRequestInit<T>, 'method'>
