@@ -11,7 +11,7 @@
     "outDir": "./tsc/",
     "skipLibCheck": true,
     "strict": true,
-    "target": "es2019",
-    "types": ["vitest/globals"]
+    "target": "ES2020",
+    "types": ["vitest/globals", "node"]
   }
 }

@@ -116,7 +116,7 @@ function makeFetcher(baseURL: string | URL, baseOptions: BaseOptions = {}) {
     const headerTransformer = async (ri: EnhancedRequestInit) => ({
       ...ri,
       headers: mergeHeaders(
-        typeof headers === 'function' ? await headers() : headers ?? {},
+        typeof headers === 'function' ? await headers() : (headers ?? {}),
         ri.headers ?? {},
         requestInit?.headers ?? {},
       ),
