@@ -198,6 +198,7 @@ describe('enhancedFetch', () => {
         method: 'POST',
         body: `{"id":1,"name":{"first":"John","last":"Doe"}}`,
       },
+      expect.any(Response),
     )
   })
 
@@ -358,6 +359,7 @@ describe('makeFetcher', () => {
         body: `{"id":1,"name":{"first":"John","last":"Doe"}}`,
         headers: new Headers(),
       },
+      expect.any(Response),
     )
   })
 })

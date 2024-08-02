@@ -408,7 +408,10 @@ await enhancedFetch("https://example.com/api/users/:role", {
 //   method: 'POST',
 //   body: '{"some":{"object":{"as":{"body":{}}}}}',
 // }
+// Response {}
 ```
+
+The `trace` function can also return a `Promise<void>` in order to send traces to an external service or database.
 
 ## typedResponse
 

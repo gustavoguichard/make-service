@@ -67,7 +67,7 @@ function typedResponse(
  * @param requestInit the requestInit to be passed to the fetch request. It is the same as the `RequestInit` type, but it also accepts a JSON-like `body` and an object-like `query` parameter.
  * @param requestInit.body the body of the request. It will be automatically stringified so you can send a JSON-like object
  * @param requestInit.query the query parameters to be added to the URL
- * @param requestInit.trace a function that receives the URL and the requestInit and can be used to log the request
+ * @param requestInit.trace a function that receives the URL, the requestInit and a clone of the response in order to log or troubleshoot the request
  * @returns a Response with typed json and text methods
  * @example const response = await fetch("https://example.com/api/users");
  * const users = await response.json(userSchema);
@@ -83,11 +83,11 @@ async function enhancedFetch<T extends string | URL>(
   const body = ensureStringBody(reqInit.body)
   const withParams = replaceURLParams<T>(url, reqInit.params ?? ({} as never))
   const fullURL = addQueryToURL(withParams, query)
-
   const enhancedReqInit = { ...reqInit, body }
-  trace?.(fullURL, enhancedReqInit)
+
   const response = await fetch(fullURL, enhancedReqInit)
 
+  await trace?.(fullURL, enhancedReqInit, typedResponse(response.clone()))
   return typedResponse(response)
 }
 
