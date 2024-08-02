@@ -83,11 +83,11 @@ async function enhancedFetch<T extends string | URL>(
   const body = ensureStringBody(reqInit.body)
   const withParams = replaceURLParams<T>(url, reqInit.params ?? ({} as never))
   const fullURL = addQueryToURL(withParams, query)
-
   const enhancedReqInit = { ...reqInit, body }
-  const response = await fetch(fullURL, enhancedReqInit)
-  await trace?.(fullURL, enhancedReqInit, response.clone())
 
+  const response = await fetch(fullURL, enhancedReqInit)
+
+  await trace?.(fullURL, enhancedReqInit, typedResponse(response.clone()))
   return typedResponse(response)
 }
 

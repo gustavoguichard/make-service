@@ -31,7 +31,7 @@ type EnhancedRequestInit<T = string> = Omit<RequestInit, 'body' | 'method'> & {
   trace?: (
     fullUrl: string | URL,
     init: EnhancedRequestInit,
-    response: Awaited<ReturnType<typeof fetch>>,
+    response: TypedResponse,
   ) => void | Promise<void>
 }
 
