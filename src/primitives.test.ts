@@ -168,6 +168,20 @@ describe('mergeHeaders', () => {
       subject.mergeHeaders(new Headers({ a: '1' }), [['a', undefined]]),
     ).toEqual(new Headers({}))
   })
+
+  it('should be case insensitive such as Headers', () => {
+    expect(
+      subject.mergeHeaders(new Headers({ 'Content-Type': 'text/html' }), {
+        'content-type': 'application/json',
+      }),
+    ).toEqual(new Headers({ 'Content-Type': 'application/json' }))
+
+    expect(
+      subject.mergeHeaders(new Headers({ 'Content-Type': 'text/html' }), {
+        'content-type': undefined,
+      }),
+    ).toEqual(new Headers({}))
+  })
 })
 
 describe('replaceURLParams', () => {

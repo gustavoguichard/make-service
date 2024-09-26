@@ -64,7 +64,7 @@ function mergeHeaders(
     | Record<string, undefined>
   )[]
 ) {
-  const result = new Map<string, string>()
+  const result = new Headers()
 
   for (const entry of entries) {
     const headers = new Headers(entry as HeadersInit)
@@ -78,7 +78,7 @@ function mergeHeaders(
     }
   }
 
-  return new Headers(Array.from(result.entries()))
+  return result
 }
 
 /**
