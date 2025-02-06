@@ -15,9 +15,11 @@
     "test": "vitest run"
   },
   "devDependencies": {
+    "@standard-schema/spec": "^1.0.0",
     "@types/node": "^22.1.0",
     "@typescript-eslint/eslint-plugin": "^8.0.0",
     "@typescript-eslint/parser": "^8.0.0",
+    "arktype": "^2.0.4",
     "eslint": "^9.8.0",
     "jsdom": "^24.1.1",
     "prettier": "latest",

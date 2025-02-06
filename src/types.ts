@@ -1,6 +1,5 @@
+import type { StandardSchemaV1 } from 'zod/lib/standard-schema'
 import type { HTTP_METHODS } from './constants'
-
-type Schema<T> = { parse: (d: unknown) => T }
 
 type JSONValue =
   | string
@@ -19,8 +18,8 @@ type TypedResponse = Omit<Response, 'json' | 'text'> & {
 
 type PathParams<T> = T extends string
   ? ExtractPathParams<T> extends Record<string, unknown>
-    ? ExtractPathParams<T>
-    : Record<string, string>
+  ? ExtractPathParams<T>
+  : Record<string, string>
   : Record<string, string>
 
 type EnhancedRequestInit<T = string> = Omit<RequestInit, 'body' | 'method'> & {
@@ -53,10 +52,10 @@ type BaseOptions = {
 
 type HTTPMethod = (typeof HTTP_METHODS)[number]
 
-type TypedResponseJson = <T = unknown>(schema?: Schema<T>) => Promise<T>
+type TypedResponseJson = <T = unknown>(schema?: StandardSchemaV1<T>) => Promise<T>
 
 type TypedResponseText = <T extends string = string>(
-  schema?: Schema<T>,
+  schema?: StandardSchemaV1<T>,
 ) => Promise<T>
 
 type GetJson = (response: Response) => TypedResponseJson
@@ -68,10 +67,10 @@ type Prettify<T> = {
 
 type ExtractPathParams<T extends string> =
   T extends `${infer _}:${infer Param}/${infer Rest}`
-    ? Prettify<Omit<{ [K in Param]: string } & ExtractPathParams<Rest>, ''>>
-    : T extends `${infer _}:${infer Param}`
-    ? { [K in Param]: string }
-    : {}
+  ? Prettify<Omit<{ [K in Param]: string } & ExtractPathParams<Rest>, ''>>
+  : T extends `${infer _}:${infer Param}`
+  ? { [K in Param]: string }
+  : {}
 
 export type {
   EnhancedRequestInit,
@@ -80,7 +79,6 @@ export type {
   HTTPMethod,
   JSONValue,
   PathParams,
-  Schema,
   SearchParams,
   ServiceRequestInit,
   BaseOptions,

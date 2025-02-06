@@ -1,4 +1,5 @@
-import type { GetJson, GetText, Schema } from './types'
+import type { StandardSchemaV1 } from 'zod/lib/standard-schema'
+import type { GetJson, GetText } from './types'
 
 /**
  * It returns the JSON object or throws an error if the response is not ok.
@@ -7,10 +8,13 @@ import type { GetJson, GetText, Schema } from './types'
  */
 const getJson: GetJson =
   (response) =>
-  async <T = unknown>(schema?: Schema<T>) => {
-    const json = await response.json()
-    return schema ? schema.parse(json) : (json as T)
-  }
+    async <T = unknown>(schema?: StandardSchemaV1<T>) => {
+      const json = await response.json()
+      if (!schema) return json as T
+      const result = await schema['~standard'].validate(json)
+      if (result.issues) throw new Error(result.issues[0].message)
+      return result.value
+    }
 
 /**
  * @param response the Response to be parsed
@@ -18,9 +22,12 @@ const getJson: GetJson =
  */
 const getText: GetText =
   (response) =>
-  async <T extends string = string>(schema?: Schema<T>) => {
-    const text = await response.text()
-    return schema ? schema.parse(text) : (text as T)
-  }
+    async <T extends string = string>(schema?: StandardSchemaV1<T>) => {
+      const text = await response.text()
+      if (!schema) return text as T
+      const result = await schema['~standard'].validate(text)
+      if (result.issues) throw new Error(result.issues[0].message)
+      return result.value
+    }
 
 export { getJson, getText }

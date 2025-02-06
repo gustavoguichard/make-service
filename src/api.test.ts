@@ -1,6 +1,7 @@
 import { HTTP_METHODS } from './constants'
 import * as subject from './api'
 import * as z from 'zod'
+import { type } from 'arktype'
 import type { HTTPMethod } from './types'
 import { deepCamelKeys } from 'string-ts'
 
@@ -98,7 +99,7 @@ describe('enhancedFetch', () => {
     vi.spyOn(global, 'fetch').mockImplementationOnce(
       successfulFetch({ foo: { 'deep-nested': { 'kind-of-value': true } } }),
     )
-    const result = await subject
+    const parsedResult = await subject
       .enhancedFetch('https://example.com/api/users')
       .then((r) =>
         r.json(
@@ -108,9 +109,9 @@ describe('enhancedFetch', () => {
                 'deep-nested': z.object({ 'kind-of-value': z.boolean() }),
               }),
             })
-            .transform(deepCamelKeys),
         ),
       )
+    const result = deepCamelKeys(parsedResult)
     type _R = Expect<
       Equal<typeof result, { foo: { deepNested: { kindOfValue: boolean } } }>
     >
@@ -431,6 +432,14 @@ describe('typedResponse', () => {
     const result = await subject
       .typedResponse(new Response(`{"foo":"bar"}`))
       .json(z.object({ foo: z.string() }))
+    type _R = Expect<Equal<typeof result, { foo: string }>>
+    expect(result).toEqual({ foo: 'bar' })
+  })
+
+  it('should accept other parsers, such as arktype for the JSON method', async () => {
+    const result = await subject
+      .typedResponse(new Response(`{"foo":"bar"}`))
+      .json(type({ foo: 'string' }))
     type _R = Expect<Equal<typeof result, { foo: string }>>
     expect(result).toEqual({ foo: 'bar' })
   })
