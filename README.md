@@ -6,7 +6,7 @@
 
 A type-safe thin wrapper around the `fetch` API to better interact with external APIs.
 
-It adds a set of little features and allows you to parse responses with [zod](https://github.com/colinhacks/zod).
+It adds a set of little features and allows you to parse responses with [standard-schema libraries](https://standardschema.dev).
 
 ## Features
 - 🤩 Type-safe return of `response.json()` and `response.text()`. Defaults to `unknown` instead of `any`.
@@ -37,6 +37,7 @@ const users = await response.json(usersSchema);
   - [makeService](#makeservice)
     - [Type-checking the response body](#type-checking-the-response-body)
     - [Runtime type-checking and parsing the response body](#runtime-type-checking-and-parsing-the-response-body)
+      - [Dealing with parsing errors](#dealing-with-parsing-errors)
     - [Supported HTTP Verbs](#supported-http-verbs)
     - [Headers](#headers)
       - [Passing a function as `headers`](#passing-a-function-as-headers)
@@ -52,13 +53,14 @@ const users = await response.json(usersSchema);
   - [makeFetcher](#makefetcher)
   - [enhancedFetch](#enhancedfetch)
   - [typedResponse](#typedresponse)
-- [Transform the Payload](#transform-the-payload)
+- [Transform the payload](#transform-the-payload)
 - [Other available primitives](#other-available-primitives)
   - [addQueryToURL](#addquerytourl)
   - [ensureStringBody](#ensurestringbody)
   - [makeGetApiURL](#makegetapiurl)
   - [mergeHeaders](#mergeheaders)
   - [replaceURLParams](#replaceurlparams)
+- [Contributors](#contributors)
 - [Acknowledgements](#acknowledgements)
 
 # Installation
@@ -119,8 +121,8 @@ const content = await response.text<`${string}@${string}`>()
 ```
 
 ### Runtime type-checking and parsing the response body
-Its [`typedResponse`](#typedresponse) can also be parsed with a zod schema. Here follows a little more complex example:
 
+Its [`typedResponse`](#typedresponse) can also be parsed with a standard schema parser. Here follows a little more complex example with Zod:
 ```ts
 const response = await service.get("/users")
 const json = await response.json(
@@ -141,6 +143,20 @@ const content = await response.text(z.string().email())
 // It will throw an error if the response.text is not a valid email
 ```
 You can transform any `Response` in a `TypedResponse` like that by using the [`typedResponse`](#typedresponse) function.
+
+#### Dealing with parsing errors
+If the response body does not match the given schema, it will throw a **ParseResponseError** which will have a message carrying all the parsing issues and its messages. You can catch it to inspect the issues:
+
+```ts
+try {
+  const response = await service.get("/users")
+  return await response.json(userSchema)
+} catch(error) {
+  if (error instanceof ParseResponseError) {
+    console.log(error.issues)
+  }
+}
+```
 
 ### Supported HTTP Verbs
 Other than the `get` it also accepts more HTTP verbs:
@@ -210,8 +226,8 @@ Note: Don't forget headers are case insensitive.
 const headers = new Headers({ 'Content-Type': 'application/json' })
 Object.fromEntries(headers) // equals to: { 'content-type': 'application/json' }
 ```
-All the features above are done by using the [`mergeHeaders`](#mergeheaders) function internally.
 
+All the features above are done by using the [`mergeHeaders`](#mergeheaders) function internally.
 
 ### Base URL
 The service function can receive a `string` or `URL` as base `url` and it will be able to merge them correctly with the given path:
@@ -427,7 +443,7 @@ The `trace` function can also return a `Promise<void>` in order to send traces t
 
 ## typedResponse
 
-A type-safe wrapper around the `Response` object. It adds a `json` and `text` method that will parse the response with a given zod schema. If you don't provide a schema, it will return `unknown` instead of `any`, then you can also give it a generic to type cast the result.
+A type-safe wrapper around the `Response` object. It adds a `json` and `text` method that will parse the response with a given standard schema library. If you don't provide a schema, it will return `unknown` instead of `any`, then you can also give it a generic to type cast the result.
 
 ```ts
 import { typedResponse } from 'make-service'
@@ -461,11 +477,11 @@ import { deepCamelKeys, deepKebabKeys } from 'string-ts'
 
 const service = makeService("https://example.com/api")
 const response = service.get("/users")
-const users = await response.json(
+const json = await response.json(
   z
     .array(z.object({ "first-name": z.string(), contact: z.object({ "home-address": z.string() }) }))
-    .transform(deepCamelKeys)
 )
+const users = deepCamelKeys(json)
 console.log(users)
 //          ^? { firstName: string, contact: { homeAddress: string } }[]
 
