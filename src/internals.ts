@@ -1,5 +1,6 @@
-import type { StandardSchemaV1 } from 'zod/lib/standard-schema'
+import type { StandardSchemaV1 } from '@standard-schema/spec'
 import type { GetJson, GetText } from './types'
+import { ParseResponseError } from './primitives'
 
 /**
  * It returns the JSON object or throws an error if the response is not ok.
@@ -12,7 +13,9 @@ const getJson: GetJson =
       const json = await response.json()
       if (!schema) return json as T
       const result = await schema['~standard'].validate(json)
-      if (result.issues) throw new Error(result.issues[0].message)
+      if (result.issues) {
+        throw new ParseResponseError('Failed to parse response.json', result.issues)
+      }
       return result.value
     }
 
@@ -26,7 +29,9 @@ const getText: GetText =
       const text = await response.text()
       if (!schema) return text as T
       const result = await schema['~standard'].validate(text)
-      if (result.issues) throw new Error(result.issues[0].message)
+      if (result.issues) {
+        throw new ParseResponseError('Failed to parse response.text', result.issues)
+      }
       return result.value
     }
 

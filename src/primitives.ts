@@ -1,3 +1,4 @@
+import type { StandardSchemaV1 } from '@standard-schema/spec'
 import type { JSONValue, PathParams, SearchParams } from './types'
 
 /**
@@ -129,6 +130,18 @@ function typeOf(t: unknown) {
     | 'urlsearchparams'
 }
 
+
+/**
+ * Error thrown when the response cannot be parsed.
+ */
+class ParseResponseError extends Error {
+  constructor(message: string, public issues: readonly StandardSchemaV1.Issue[]) {
+    super(JSON.stringify({ message, issues }, null, 2))
+    this.name = 'ParseResponseError'
+    this.issues = issues
+  }
+}
+
 export {
   addQueryToURL,
   ensureStringBody,
@@ -137,3 +150,4 @@ export {
   replaceURLParams,
   typeOf,
 }
+export { ParseResponseError }

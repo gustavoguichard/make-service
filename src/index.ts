@@ -6,5 +6,6 @@ export {
   mergeHeaders,
   replaceURLParams,
   typeOf,
+  ParseResponseError,
 } from './primitives'
 export type * from './types'
