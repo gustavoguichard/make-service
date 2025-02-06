@@ -231,16 +231,28 @@ You can use the [`makeGetApiUrl`](#makegetapiurl) method to do that kind of URL 
 `makeService` can also receive `requestTransformer` and `responseTransformer` as options that will be applied to all requests.
 
 #### Request transformers
-You can transform the request in any way you want, like:
+You can transform the request in any way you want passing a transformer function as a parameter. This will be applied to all requests for that service.
+A useful example is to implement a global request timeout for all endpoints of a service:
 
 ```ts
-const service = makeService('https://example.com/api', {
-  requestTransformer: (request) => ({ ...request, query: { admin: 'true' } }),
-})
+function timeoutRequestIn30Seconds(
+  request: EnhancedRequestInit<string>,
+): EnhancedRequestInit<string> {
+  const terminator = new AbortController()
+  terminator.signal.throwIfAborted()
+  setTimeout(() => terminator.abort(), 30000)
+
+  return {
+    ...request,
+    signal: terminator.signal,
+  }
+}
+
+const service = makeService('https://example.com/api', { requestTransformer: timeoutRequestIn30Seconds })
 
 const response = await service.get("/users")
 
-// It will call "https://example.com/api/users?admin=true"
+// It will call "https://example.com/api/users" aborting (and throwing an exception) if it takes more than 30 seconds.
 ```
 
 Please note that the `headers` option will be applied _after_ the request transformer runs. If you're using a request transformer, we recommend adding custom headers inside your transformer instead of using both options.
