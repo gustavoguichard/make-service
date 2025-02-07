@@ -19,8 +19,8 @@ type TypedResponse = Omit<Response, 'json' | 'text'> & {
 type PathParams<T> = T extends string
   ? ExtractPathParams<T> extends Record<string, unknown>
   ? ExtractPathParams<T>
-  : Record<string, string>
-  : Record<string, string>
+  : Record<string, string | number>
+  : Record<string, string | number>
 
 type EnhancedRequestInit<T = string> = Omit<RequestInit, 'body' | 'method'> & {
   method?: HTTPMethod | Lowercase<HTTPMethod>
@@ -67,9 +67,9 @@ type Prettify<T> = {
 
 type ExtractPathParams<T extends string> =
   T extends `${infer _}:${infer Param}/${infer Rest}`
-  ? Prettify<Omit<{ [K in Param]: string } & ExtractPathParams<Rest>, ''>>
+  ? Prettify<Omit<{ [K in Param]: string | number } & ExtractPathParams<Rest>, ''>>
   : T extends `${infer _}:${infer Param}`
-  ? { [K in Param]: string }
+  ? { [K in Param]: string | number }
   : {}
 
 export type {
