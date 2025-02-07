@@ -4,6 +4,7 @@ import * as z from 'zod'
 import { type } from 'arktype'
 import type { HTTPMethod } from './types'
 import { deepCamelKeys } from 'string-ts'
+import { ParseResponseError } from './primitives'
 
 const reqMock = vi.fn()
 function successfulFetch(response: string | Record<string, unknown>) {
@@ -442,5 +443,20 @@ describe('typedResponse', () => {
       .json(type({ foo: 'string' }))
     type _R = Expect<Equal<typeof result, { foo: string }>>
     expect(result).toEqual({ foo: 'bar' })
+  })
+
+  it('should throw a ParseResponseError when the JSON does not match the parser', async () => {
+    const response = new Response(`{"foo":1}`)
+    try {
+      await subject.typedResponse(response).json(z.object({ foo: z.string() }))
+    } catch (error) {
+      if (!(error instanceof ParseResponseError)) throw error
+
+      expect(error).toBeInstanceOf(ParseResponseError)
+      expect(error.message).toContain(
+        `"message": "Failed to parse response.json"`,
+      )
+      expect(error.issues).toMatchObject([{ message: 'Expected string, received number', path: ['foo'] }])
+    }
   })
 })
