@@ -202,6 +202,10 @@ describe('replaceURLParams', () => {
       }),
     ).toEqual(new URL('http://example.com/users/1'))
   })
+
+  it('should accept numbers as parameters', () => {
+    expect(subject.replaceURLParams('/users/:id', { id: 1 })).toBe('/users/1')
+  })
 })
 
 describe('typeOf', () => {
