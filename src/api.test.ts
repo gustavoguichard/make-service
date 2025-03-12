@@ -1,10 +1,10 @@
-import { HTTP_METHODS } from './constants'
-import * as subject from './api'
-import * as z from 'zod'
 import { type } from 'arktype'
-import type { HTTPMethod } from './types'
 import { deepCamelKeys } from 'string-ts'
+import * as z from 'zod'
+import * as subject from './api'
+import { HTTP_METHODS } from './constants'
 import { ParseResponseError } from './primitives'
+import type { HTTPMethod } from './types'
 
 const reqMock = vi.fn()
 function successfulFetch(response: string | Record<string, unknown>) {
@@ -16,7 +16,7 @@ function successfulFetch(response: string | Record<string, unknown>) {
       body: init?.body,
     })
     return new Response(
-      typeof response === 'string' ? response : JSON.stringify(response),
+      typeof response === 'string' ? response : JSON.stringify(response)
     )
   }
 }
@@ -29,7 +29,7 @@ describe('enhancedFetch', () => {
   describe('json', () => {
     it('should be untyped by default', async () => {
       vi.spyOn(global, 'fetch').mockImplementationOnce(
-        successfulFetch({ foo: 'bar' }),
+        successfulFetch({ foo: 'bar' })
       )
       const result = await subject
         .enhancedFetch('https://example.com/api/users')
@@ -40,7 +40,7 @@ describe('enhancedFetch', () => {
 
     it('should accept a type', async () => {
       vi.spyOn(global, 'fetch').mockImplementationOnce(
-        successfulFetch({ foo: 'bar' }),
+        successfulFetch({ foo: 'bar' })
       )
       const result = await subject
         .enhancedFetch('https://example.com/api/users')
@@ -51,7 +51,7 @@ describe('enhancedFetch', () => {
 
     it('should accept a parser', async () => {
       vi.spyOn(global, 'fetch').mockImplementationOnce(
-        successfulFetch({ foo: 'bar' }),
+        successfulFetch({ foo: 'bar' })
       )
       const result = await subject
         .enhancedFetch('https://example.com/api/users')
@@ -64,7 +64,7 @@ describe('enhancedFetch', () => {
   describe('text', () => {
     it('should be untyped by default', async () => {
       vi.spyOn(global, 'fetch').mockImplementationOnce(
-        successfulFetch({ foo: 'bar' }),
+        successfulFetch({ foo: 'bar' })
       )
       const result = await subject
         .enhancedFetch('https://example.com/api/users')
@@ -75,7 +75,7 @@ describe('enhancedFetch', () => {
 
     it('should accept a type', async () => {
       vi.spyOn(global, 'fetch').mockImplementationOnce(
-        successfulFetch('john@doe.com'),
+        successfulFetch('john@doe.com')
       )
       const result = await subject
         .enhancedFetch('https://example.com/api/users')
@@ -86,7 +86,7 @@ describe('enhancedFetch', () => {
 
     it('should accept a parser', async () => {
       vi.spyOn(global, 'fetch').mockImplementationOnce(
-        successfulFetch('john@doe.com'),
+        successfulFetch('john@doe.com')
       )
       const result = await subject
         .enhancedFetch('https://example.com/api/users')
@@ -98,19 +98,18 @@ describe('enhancedFetch', () => {
 
   it('should accept a schema that transforms the response', async () => {
     vi.spyOn(global, 'fetch').mockImplementationOnce(
-      successfulFetch({ foo: { 'deep-nested': { 'kind-of-value': true } } }),
+      successfulFetch({ foo: { 'deep-nested': { 'kind-of-value': true } } })
     )
     const parsedResult = await subject
       .enhancedFetch('https://example.com/api/users')
       .then((r) =>
         r.json(
-          z
-            .object({
-              foo: z.object({
-                'deep-nested': z.object({ 'kind-of-value': z.boolean() }),
-              }),
-            })
-        ),
+          z.object({
+            foo: z.object({
+              'deep-nested': z.object({ 'kind-of-value': z.boolean() }),
+            }),
+          })
+        )
       )
     const result = deepCamelKeys(parsedResult)
     type _R = Expect<
@@ -121,7 +120,7 @@ describe('enhancedFetch', () => {
 
   it('should replace params in the URL', async () => {
     vi.spyOn(global, 'fetch').mockImplementationOnce(
-      successfulFetch({ foo: 'bar' }),
+      successfulFetch({ foo: 'bar' })
     )
     await subject.enhancedFetch(
       'https://example.com/api/users/:user/page/:page',
@@ -132,7 +131,7 @@ describe('enhancedFetch', () => {
           // @ts-expect-error argument not infered from URL
           foo: 'bar',
         },
-      },
+      }
     )
     expect(reqMock).toHaveBeenCalledWith({
       url: 'https://example.com/api/users/1/page/2',
@@ -141,7 +140,7 @@ describe('enhancedFetch', () => {
 
   it('should accept a requestInit and a query', async () => {
     vi.spyOn(global, 'fetch').mockImplementationOnce(
-      successfulFetch({ foo: 'bar' }),
+      successfulFetch({ foo: 'bar' })
     )
     await subject.enhancedFetch('https://example.com/api/users', {
       headers: { Authorization: 'Bearer 123' },
@@ -155,7 +154,7 @@ describe('enhancedFetch', () => {
 
   it('should accept a stringified body', async () => {
     vi.spyOn(global, 'fetch').mockImplementationOnce(
-      successfulFetch({ foo: 'bar' }),
+      successfulFetch({ foo: 'bar' })
     )
     await subject.enhancedFetch('https://example.com/api/users', {
       body: JSON.stringify({ id: 1, name: { first: 'John', last: 'Doe' } }),
@@ -170,7 +169,7 @@ describe('enhancedFetch', () => {
 
   it('should stringify the body', async () => {
     vi.spyOn(global, 'fetch').mockImplementationOnce(
-      successfulFetch({ foo: 'bar' }),
+      successfulFetch({ foo: 'bar' })
     )
     await subject.enhancedFetch('https://example.com/api/users', {
       body: { id: 1, name: { first: 'John', last: 'Doe' } },
@@ -186,7 +185,7 @@ describe('enhancedFetch', () => {
   it('should accept a trace function for debugging purposes', async () => {
     const trace = vi.fn()
     vi.spyOn(global, 'fetch').mockImplementationOnce(
-      successfulFetch({ foo: 'bar' }),
+      successfulFetch({ foo: 'bar' })
     )
     await subject.enhancedFetch('https://example.com/api/users', {
       body: { id: 1, name: { first: 'John', last: 'Doe' } },
@@ -200,7 +199,7 @@ describe('enhancedFetch', () => {
         method: 'POST',
         body: `{"id":1,"name":{"first":"John","last":"Doe"}}`,
       },
-      expect.any(Response),
+      expect.any(Response)
     )
   })
 
@@ -214,11 +213,11 @@ describe('enhancedFetch', () => {
 describe('makeFetcher', () => {
   it('should return an applied enhancedFetch', async () => {
     vi.spyOn(global, 'fetch').mockImplementationOnce(
-      successfulFetch({ foo: 'bar' }),
+      successfulFetch({ foo: 'bar' })
     )
     const service = subject.makeFetcher('https://example.com/api')
     const result = await service('/users', { method: 'post' }).then((r) =>
-      r.json(z.object({ foo: z.string() })),
+      r.json(z.object({ foo: z.string() }))
     )
     type _R = Expect<Equal<typeof result, { foo: string }>>
 
@@ -232,7 +231,7 @@ describe('makeFetcher', () => {
 
   it('should add headers to the request', async () => {
     vi.spyOn(global, 'fetch').mockImplementationOnce(
-      successfulFetch({ foo: 'bar' }),
+      successfulFetch({ foo: 'bar' })
     )
     const fetcher = subject.makeFetcher('https://example.com/api', {
       headers: {
@@ -251,7 +250,7 @@ describe('makeFetcher', () => {
 
   it('should transform the request', async () => {
     vi.spyOn(global, 'fetch').mockImplementationOnce(
-      successfulFetch({ foo: 'bar' }),
+      successfulFetch({ foo: 'bar' })
     )
     const fetcher = subject.makeFetcher('https://example.com/api', {
       headers: {
@@ -268,7 +267,7 @@ describe('makeFetcher', () => {
 
   it('should transform the response', async () => {
     vi.spyOn(global, 'fetch').mockImplementationOnce(
-      successfulFetch({ foo: 'bar' }),
+      successfulFetch({ foo: 'bar' })
     )
     const fetcher = subject.makeFetcher('https://example.com/api', {
       headers: {
@@ -289,7 +288,7 @@ describe('makeFetcher', () => {
 
   it('should accept a typed params object', async () => {
     vi.spyOn(global, 'fetch').mockImplementationOnce(
-      successfulFetch({ foo: 'bar' }),
+      successfulFetch({ foo: 'bar' })
     )
     const fetcher = subject.makeFetcher('https://example.com/api')
     await fetcher('/users/:id', {
@@ -307,7 +306,7 @@ describe('makeFetcher', () => {
 
   it('should accept a function for dynamic headers', async () => {
     vi.spyOn(global, 'fetch').mockImplementationOnce(
-      successfulFetch({ foo: 'bar' }),
+      successfulFetch({ foo: 'bar' })
     )
     const fetcher = subject.makeFetcher('https://example.com/api', {
       headers: () => ({
@@ -323,7 +322,7 @@ describe('makeFetcher', () => {
 
   it('should accept an async function for dynamic headers', async () => {
     vi.spyOn(global, 'fetch').mockImplementationOnce(
-      successfulFetch({ foo: 'bar' }),
+      successfulFetch({ foo: 'bar' })
     )
     const fetcher = subject.makeFetcher('https://example.com/api', {
       headers: async () => ({
@@ -345,7 +344,7 @@ describe('makeFetcher', () => {
   it('should accept a query, trace, and JSON-like body', async () => {
     const trace = vi.fn()
     vi.spyOn(global, 'fetch').mockImplementationOnce(
-      successfulFetch({ foo: 'bar' }),
+      successfulFetch({ foo: 'bar' })
     )
     const fetcher = subject.makeFetcher('https://example.com/api')
     await fetcher('/users', {
@@ -361,7 +360,7 @@ describe('makeFetcher', () => {
         body: `{"id":1,"name":{"first":"John","last":"Doe"}}`,
         headers: new Headers(),
       },
-      expect.any(Response),
+      expect.any(Response)
     )
   })
 })
@@ -371,14 +370,14 @@ describe('makeService', () => {
     const service = subject.makeService('https://example.com/api')
     for (const method of HTTP_METHODS) {
       expect(
-        typeof service[method.toLocaleLowerCase() as Lowercase<HTTPMethod>],
+        typeof service[method.toLocaleLowerCase() as Lowercase<HTTPMethod>]
       ).toBe('function')
     }
   })
 
   it('should return an API with enhancedFetch', async () => {
     vi.spyOn(global, 'fetch').mockImplementationOnce(
-      successfulFetch({ foo: 'bar' }),
+      successfulFetch({ foo: 'bar' })
     )
     const service = subject.makeService('https://example.com/api')
     const result = await service
@@ -396,7 +395,7 @@ describe('makeService', () => {
 
   it('should accept a typed params object', async () => {
     vi.spyOn(global, 'fetch').mockImplementationOnce(
-      successfulFetch({ foo: 'bar' }),
+      successfulFetch({ foo: 'bar' })
     )
     const service = subject.makeService('https://example.com/api')
     await service.get('/users/:id', {
@@ -454,9 +453,11 @@ describe('typedResponse', () => {
 
       expect(error).toBeInstanceOf(ParseResponseError)
       expect(error.message).toContain(
-        `"message": "Failed to parse response.json"`,
+        `"message": "Failed to parse response.json"`
       )
-      expect(error.issues).toMatchObject([{ message: 'Expected string, received number', path: ['foo'] }])
+      expect(error.issues).toMatchObject([
+        { message: 'Expected string, received number', path: ['foo'] },
+      ])
     }
   })
 })

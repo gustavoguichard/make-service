@@ -10,29 +10,23 @@
   "scripts": {
     "build": "tsup ./src/index.ts --format esm,cjs --dts",
     "dev": "tsup ./src/index.ts --format esm,cjs --watch --dts",
-    "lint": "eslint --config eslint.config.mjs .",
+    "lint": "node_modules/.bin/biome check --write --error-on-warnings",
     "tsc": "tsc --noEmit",
     "test": "vitest run"
   },
   "devDependencies": {
+    "@biomejs/biome": "^1.9.4",
     "@standard-schema/spec": "^1.0.0",
     "@types/node": "^22.1.0",
-    "@typescript-eslint/eslint-plugin": "^8.0.0",
-    "@typescript-eslint/parser": "^8.0.0",
     "arktype": "^2.0.4",
-    "eslint": "^9.8.0",
     "jsdom": "^24.1.1",
-    "prettier": "latest",
     "string-ts": "^2.2.0",
     "tsup": "^8.2.4",
     "typescript": "^5.5.4",
     "vitest": "latest",
     "zod": "latest"
   },
-  "files": [
-    "README.md",
-    "./dist/*"
-  ],
+  "files": ["README.md", "./dist/*"],
   "repository": {
     "type": "git",
     "url": "git+https://github.com/gustavoguichard/make-service.git"

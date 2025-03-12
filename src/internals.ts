@@ -1,6 +1,6 @@
 import type { StandardSchemaV1 } from '@standard-schema/spec'
-import type { GetJson, GetText } from './types'
 import { ParseResponseError } from './primitives'
+import type { GetJson, GetText } from './types'
 
 /**
  * It returns the JSON object or throws an error if the response is not ok.
@@ -9,15 +9,18 @@ import { ParseResponseError } from './primitives'
  */
 const getJson: GetJson =
   (response) =>
-    async <T = unknown>(schema?: StandardSchemaV1<T>) => {
-      const json = await response.json()
-      if (!schema) return json as T
-      const result = await schema['~standard'].validate(json)
-      if (result.issues) {
-        throw new ParseResponseError('Failed to parse response.json', result.issues)
-      }
-      return result.value
+  async <T = unknown>(schema?: StandardSchemaV1<T>) => {
+    const json = await response.json()
+    if (!schema) return json as T
+    const result = await schema['~standard'].validate(json)
+    if (result.issues) {
+      throw new ParseResponseError(
+        'Failed to parse response.json',
+        result.issues
+      )
     }
+    return result.value
+  }
 
 /**
  * @param response the Response to be parsed
@@ -25,14 +28,17 @@ const getJson: GetJson =
  */
 const getText: GetText =
   (response) =>
-    async <T extends string = string>(schema?: StandardSchemaV1<T>) => {
-      const text = await response.text()
-      if (!schema) return text as T
-      const result = await schema['~standard'].validate(text)
-      if (result.issues) {
-        throw new ParseResponseError('Failed to parse response.text', result.issues)
-      }
-      return result.value
+  async <T extends string = string>(schema?: StandardSchemaV1<T>) => {
+    const text = await response.text()
+    if (!schema) return text as T
+    const result = await schema['~standard'].validate(text)
+    if (result.issues) {
+      throw new ParseResponseError(
+        'Failed to parse response.text',
+        result.issues
+      )
     }
+    return result.value
+  }
 
 export { getJson, getText }
