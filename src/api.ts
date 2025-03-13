@@ -37,7 +37,7 @@ const identity = <T>(value: T) => value
  */
 function typedResponse(
   response: Response,
-  options?: { getJson?: GetJson; getText?: GetText },
+  options?: { getJson?: GetJson; getText?: GetText }
 ): TypedResponse {
   const getJsonFn = options?.getJson ?? getJson
   const getTextFn = options?.getText ?? getText
@@ -77,7 +77,7 @@ function typedResponse(
  */
 async function enhancedFetch<T extends string | URL>(
   url: T,
-  requestInit?: EnhancedRequestInit<T>,
+  requestInit?: EnhancedRequestInit<T>
 ) {
   const { query, trace, ...reqInit } = requestInit ?? {}
   const body = ensureStringBody(reqInit.body)
@@ -108,7 +108,7 @@ async function enhancedFetch<T extends string | URL>(
 function makeFetcher(baseURL: string | URL, baseOptions: BaseOptions = {}) {
   return async <T extends string>(
     path: T,
-    requestInit: EnhancedRequestInit<T> = {},
+    requestInit: EnhancedRequestInit<T> = {}
   ) => {
     const { headers } = baseOptions
     const requestTransformer = baseOptions.requestTransformer ?? identity
@@ -118,14 +118,14 @@ function makeFetcher(baseURL: string | URL, baseOptions: BaseOptions = {}) {
       headers: mergeHeaders(
         typeof headers === 'function' ? await headers() : (headers ?? {}),
         ri.headers ?? {},
-        requestInit?.headers ?? {},
+        requestInit?.headers ?? {}
       ),
     })
 
     const url = makeGetApiURL(baseURL)(path)
     const response = await enhancedFetch(
       url,
-      await headerTransformer(await requestTransformer(requestInit)),
+      await headerTransformer(await requestTransformer(requestInit))
     )
     return responseTransformer(response)
   }
@@ -151,7 +151,7 @@ function makeService(baseURL: string | URL, baseOptions?: BaseOptions) {
   function appliedService(method: HTTPMethod) {
     return async <T extends string>(
       path: T,
-      requestInit: ServiceRequestInit<T> = {},
+      requestInit: ServiceRequestInit<T> = {}
     ) => fetcher(path, { ...requestInit, method })
   }
 

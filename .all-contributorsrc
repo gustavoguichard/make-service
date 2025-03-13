@@ -1,9 +1,7 @@
 {
   "projectName": "make-service",
   "projectOwner": "gustavoguichard",
-  "files": [
-    "README.md"
-  ],
+  "files": ["README.md"],
   "commitType": "docs",
   "commitConvention": "angular",
   "contributorsPerLine": 7,
@@ -33,14 +31,7 @@
       "name": "Daniel Weinmann",
       "avatar_url": "https://avatars.githubusercontent.com/u/204765?v=4",
       "profile": "https://www.linkedin.com/in/danielweinmann",
-      "contributions": [
-        "code",
-        "promotion",
-        "ideas",
-        "doc",
-        "bug",
-        "review"
-      ]
+      "contributions": ["code", "promotion", "ideas", "doc", "bug", "review"]
     },
     {
       "login": "iamandrewluca",
@@ -61,20 +52,14 @@
       "name": "Diogo Biazus",
       "avatar_url": "https://avatars.githubusercontent.com/u/20662?v=4",
       "profile": "https://github.com/diogob",
-      "contributions": [
-        "code",
-        "doc"
-      ]
+      "contributions": ["code", "doc"]
     },
     {
       "login": "garusis",
       "name": "Marcos Javier Alvarez Maestre",
       "avatar_url": "https://avatars.githubusercontent.com/u/15615652?v=4",
       "profile": "https://github.com/garusis",
-      "contributions": [
-        "code",
-        "bug"
-      ]
+      "contributions": ["code", "bug"]
     }
   ]
 }

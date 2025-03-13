@@ -18,8 +18,8 @@ type TypedResponse = Omit<Response, 'json' | 'text'> & {
 
 type PathParams<T> = T extends string
   ? ExtractPathParams<T> extends Record<string, unknown>
-  ? ExtractPathParams<T>
-  : Record<string, string | number>
+    ? ExtractPathParams<T>
+    : Record<string, string | number>
   : Record<string, string | number>
 
 type EnhancedRequestInit<T = string> = Omit<RequestInit, 'body' | 'method'> & {
@@ -30,18 +30,18 @@ type EnhancedRequestInit<T = string> = Omit<RequestInit, 'body' | 'method'> & {
   trace?: (
     fullUrl: string | URL,
     init: EnhancedRequestInit,
-    response: TypedResponse,
+    response: TypedResponse
   ) => void | Promise<void>
 }
 
 type ServiceRequestInit<T = string> = Omit<EnhancedRequestInit<T>, 'method'>
 
 type RequestTransformer = (
-  request: EnhancedRequestInit,
+  request: EnhancedRequestInit
 ) => EnhancedRequestInit | Promise<EnhancedRequestInit>
 
 type ResponseTransformer = (
-  response: TypedResponse,
+  response: TypedResponse
 ) => TypedResponse | Promise<TypedResponse>
 
 type BaseOptions = {
@@ -52,10 +52,12 @@ type BaseOptions = {
 
 type HTTPMethod = (typeof HTTP_METHODS)[number]
 
-type TypedResponseJson = <T = unknown>(schema?: StandardSchemaV1<T>) => Promise<T>
+type TypedResponseJson = <T = unknown>(
+  schema?: StandardSchemaV1<T>
+) => Promise<T>
 
 type TypedResponseText = <T extends string = string>(
-  schema?: StandardSchemaV1<T>,
+  schema?: StandardSchemaV1<T>
 ) => Promise<T>
 
 type GetJson = (response: Response) => TypedResponseJson
@@ -67,10 +69,13 @@ type Prettify<T> = {
 
 type ExtractPathParams<T extends string> =
   T extends `${infer _}:${infer Param}/${infer Rest}`
-  ? Prettify<Omit<{ [K in Param]: string | number } & ExtractPathParams<Rest>, ''>>
-  : T extends `${infer _}:${infer Param}`
-  ? { [K in Param]: string | number }
-  : {}
+    ? Prettify<
+        Omit<{ [K in Param]: string | number } & ExtractPathParams<Rest>, ''>
+      >
+    : T extends `${infer _}:${infer Param}`
+      ? { [K in Param]: string | number }
+      : // biome-ignore lint/complexity/noBannedTypes: <explanation>
+        {}
 
 export type {
   EnhancedRequestInit,
