@@ -1,4 +1,4 @@
-import type { StandardSchemaV1 } from 'zod/lib/standard-schema'
+import type { StandardSchemaV1 } from '@standard-schema/spec'
 import type { HTTP_METHODS } from './constants'
 
 type JSONValue =

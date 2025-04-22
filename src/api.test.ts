@@ -1,6 +1,6 @@
 import { type } from 'arktype'
 import { deepCamelKeys } from 'string-ts'
-import * as z from 'zod'
+import { z } from 'zod'
 import * as subject from './api'
 import { HTTP_METHODS } from './constants'
 import { ParseResponseError } from './primitives'
@@ -456,7 +456,10 @@ describe('typedResponse', () => {
         `"message": "Failed to parse response.json"`
       )
       expect(error.issues).toMatchObject([
-        { message: 'Expected string, received number', path: ['foo'] },
+        {
+          message: 'Invalid input: expected string, received number',
+          path: ['foo'],
+        },
       ])
     }
   })
