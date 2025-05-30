@@ -206,6 +206,31 @@ describe('replaceURLParams', () => {
   it('should accept numbers as parameters', () => {
     expect(subject.replaceURLParams('/users/:id', { id: 1 })).toBe('/users/1')
   })
+
+  it('should prefer URLPattern when available', () => {
+    const original = (globalThis as any).URLPattern
+    const build = vi.fn((params: Record<string, string | number>) => {
+      return `/users/${params.id}`
+    })
+    ;(globalThis as any).URLPattern = class {
+      constructor(public pattern: string) {}
+      build = build
+    }
+
+    expect(subject.replaceURLParams('/users/:id', { id: '2' })).toBe('/users/2')
+    expect(build).toHaveBeenCalled()
+    ;(globalThis as any).URLPattern = original
+  })
+
+  it('should fallback when URLPattern lacks build method', () => {
+    const original = (globalThis as any).URLPattern
+    ;(globalThis as any).URLPattern = class {
+      constructor(public pattern: string) {}
+    }
+
+    expect(subject.replaceURLParams('/users/:id', { id: '3' })).toBe('/users/3')
+    ;(globalThis as any).URLPattern = original
+  })
 })
 
 describe('typeOf', () => {

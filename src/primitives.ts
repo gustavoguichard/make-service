@@ -1,6 +1,8 @@
 import type { StandardSchemaV1 } from '@standard-schema/spec'
 import type { JSONValue, PathParams, SearchParams } from './types'
 
+declare const URLPattern: any
+
 /**
  * @param url a string or URL to which the query parameters will be added
  * @param searchParams the query parameters
@@ -92,12 +94,31 @@ function replaceURLParams<T extends string | URL>(
   url: T,
   params: PathParams<T>
 ): T {
-  // TODO: use the URL Pattern API as soon as it has better browser support
   if (!params) return url as T
 
   let urlString = String(url)
-  for (const [key, value] of Object.entries(params)) {
-    urlString = urlString.replace(new RegExp(`:${key}($|/)`), `${value}$1`)
+  if (typeof URLPattern !== 'undefined') {
+    try {
+      const pattern = new URLPattern(urlString)
+      if (typeof pattern.build === 'function') {
+        urlString = pattern.build(params)
+      } else {
+        for (const [key, value] of Object.entries(params)) {
+          urlString = urlString.replace(
+            new RegExp(`:${key}($|/)`),
+            `${value}$1`
+          )
+        }
+      }
+    } catch {
+      for (const [key, value] of Object.entries(params)) {
+        urlString = urlString.replace(new RegExp(`:${key}($|/)`), `${value}$1`)
+      }
+    }
+  } else {
+    for (const [key, value] of Object.entries(params)) {
+      urlString = urlString.replace(new RegExp(`:${key}($|/)`), `${value}$1`)
+    }
   }
   return (url instanceof URL ? new URL(urlString) : urlString) as T
 }

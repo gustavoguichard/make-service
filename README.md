@@ -608,6 +608,8 @@ const url = replaceURLParams(
 )
 // It will return: "https://example.com/users/2/posts/3"
 ```
+If supported, this uses the `URLPattern` API to replace the parameters; otherwise
+it falls back to a regular expression replacement.
 
 The params will be **strongly-typed** which means they will be validated against the URL structure and will not type-check if the given object does not match that structure.
 
