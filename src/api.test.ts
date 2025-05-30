@@ -463,4 +463,41 @@ describe('typedResponse', () => {
       ])
     }
   })
+
+  it('should return string by default when turning into text', async () => {
+    const result = await subject.typedResponse(new Response('foo')).text()
+    type _R = Expect<Equal<typeof result, string>>
+    expect(result).toBe('foo')
+  })
+
+  it('should accept a type for the text method', async () => {
+    const result = await subject
+      .typedResponse(new Response('john@doe.com'))
+      .text<`${string}@${string}.${string}`>()
+    type _R = Expect<Equal<typeof result, `${string}@${string}.${string}`>>
+    expect(result).toBe('john@doe.com')
+  })
+
+  it('should accept a parser for the text method', async () => {
+    const result = await subject
+      .typedResponse(new Response('john@doe.com'))
+      .text(z.string().email())
+    type _R = Expect<Equal<typeof result, string>>
+    expect(result).toBe('john@doe.com')
+  })
+
+  it('should throw a ParseResponseError when the text does not match the parser', async () => {
+    const response = new Response('not an email')
+    try {
+      await subject.typedResponse(response).text(z.string().email())
+    } catch (error) {
+      if (!(error instanceof ParseResponseError)) throw error
+
+      expect(error).toBeInstanceOf(ParseResponseError)
+      expect(error.message).toContain(
+        `"message": "Failed to parse response.text"`
+      )
+      expect(error.issues.length).toBeGreaterThan(0)
+    }
+  })
 })
