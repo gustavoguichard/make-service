@@ -15,18 +15,19 @@ describe('addQueryToURL', () => {
   })
 
   it('should add the query object to a URL input', () => {
-    expect(
-      subject
-        .addQueryToURL(new URL('https://example.com/api'), {
-          id: '1',
-        })
-        .toString()
-    ).toEqual(new URL('https://example.com/api?id=1').toString())
-    expect(
-      subject
-        .addQueryToURL(new URL('https://example.com/api'), 'page=2')
-        .toString()
-    ).toEqual(new URL('https://example.com/api?page=2').toString())
+    const base = new URL('https://example.com/api')
+    const result = subject.addQueryToURL(base, { id: '1' })
+    expect(result.toString()).toEqual(
+      new URL('https://example.com/api?id=1').toString()
+    )
+    expect(base.toString()).toEqual('https://example.com/api')
+
+    const base2 = new URL('https://example.com/api')
+    const result2 = subject.addQueryToURL(base2, 'page=2')
+    expect(result2.toString()).toEqual(
+      new URL('https://example.com/api?page=2').toString()
+    )
+    expect(base2.toString()).toEqual('https://example.com/api')
   })
 
   it('should append the query to a URL string that already has QS', () => {
@@ -45,26 +46,29 @@ describe('addQueryToURL', () => {
   })
 
   it('should append the query to a URL instance that already has QS', () => {
-    expect(
-      subject
-        .addQueryToURL(new URL('https://example.com/api?id=1'), {
-          page: '2',
-        })
-        .toString()
-    ).toEqual(new URL('https://example.com/api?id=1&page=2').toString())
-    expect(
-      subject
-        .addQueryToURL(new URL('https://example.com/api?id=1'), 'page=2')
-        .toString()
-    ).toEqual(new URL('https://example.com/api?id=1&page=2').toString())
-    expect(
-      subject
-        .addQueryToURL(
-          new URL('https://example.com/api?id=1'),
-          new URLSearchParams({ page: '2' })
-        )
-        .toString()
-    ).toEqual(new URL('https://example.com/api?id=1&page=2').toString())
+    const base = new URL('https://example.com/api?id=1')
+    const result = subject.addQueryToURL(base, { page: '2' })
+    expect(result.toString()).toEqual(
+      new URL('https://example.com/api?id=1&page=2').toString()
+    )
+    expect(base.toString()).toEqual('https://example.com/api?id=1')
+
+    const base2 = new URL('https://example.com/api?id=1')
+    const result2 = subject.addQueryToURL(base2, 'page=2')
+    expect(result2.toString()).toEqual(
+      new URL('https://example.com/api?id=1&page=2').toString()
+    )
+    expect(base2.toString()).toEqual('https://example.com/api?id=1')
+
+    const base3 = new URL('https://example.com/api?id=1')
+    const result3 = subject.addQueryToURL(
+      base3,
+      new URLSearchParams({ page: '2' })
+    )
+    expect(result3.toString()).toEqual(
+      new URL('https://example.com/api?id=1&page=2').toString()
+    )
+    expect(base3.toString()).toEqual('https://example.com/api?id=1')
   })
 
   it("should return the input in case there's no query", () => {
