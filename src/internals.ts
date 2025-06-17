@@ -9,9 +9,11 @@ import type { GetJson, GetText } from './types'
  */
 const getJson: GetJson =
   (response) =>
-  async <T = unknown>(schema?: StandardSchemaV1<T>) => {
+  async <Input = unknown, Output = Input>(
+    schema?: StandardSchemaV1<Input, Output>
+  ) => {
     const json = await response.json()
-    if (!schema) return json as T
+    if (!schema) return json as Output
     const result = await schema['~standard'].validate(json)
     if (result.issues) {
       throw new ParseResponseError(
@@ -28,9 +30,11 @@ const getJson: GetJson =
  */
 const getText: GetText =
   (response) =>
-  async <T extends string = string>(schema?: StandardSchemaV1<T>) => {
+  async <Input extends string = string, Output = Input>(
+    schema?: StandardSchemaV1<Input, Output>
+  ) => {
     const text = await response.text()
-    if (!schema) return text as T
+    if (!schema) return text as Output
     const result = await schema['~standard'].validate(text)
     if (result.issues) {
       throw new ParseResponseError(
