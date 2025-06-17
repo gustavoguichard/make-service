@@ -10,16 +10,24 @@ function addQueryToURL<T extends string | URL>(
   url: T,
   searchParams?: SearchParams
 ): T {
-  if (!searchParams) return url
+  if (searchParams === undefined) return url
 
   if (typeof url === 'string') {
-    const separator = url.includes('?') ? '&' : '?'
-    return `${url}${separator}${new URLSearchParams(searchParams)}` as T
+    const hasQuery = url.includes('?')
+    const qs = new URLSearchParams(searchParams).toString()
+    if (!qs) return (hasQuery ? url : `${url}?`) as T
+    const separator = hasQuery ? '&' : '?'
+    return `${url}${separator}${qs}` as T
   }
-  if (searchParams && url instanceof URL) {
+  if (url instanceof URL) {
     const result = new URL(url.toString())
-    for (const [key, value] of new URLSearchParams(searchParams).entries()) {
-      result.searchParams.set(key, value)
+    const qs = new URLSearchParams(searchParams)
+    if (!qs.toString()) {
+      if (!result.search) result.search = '?'
+    } else {
+      for (const [key, value] of qs.entries()) {
+        result.searchParams.set(key, value)
+      }
     }
     return result as T
   }
@@ -37,7 +45,7 @@ function ensureStringBody<B extends JSONValue | BodyInit | null>(
   if (typeof body === 'string') return body as never
 
   return (
-    ['number', 'boolean', 'array', 'object'].includes(typeOf(body))
+    ['number', 'boolean', 'array', 'object', 'date'].includes(typeOf(body))
       ? JSON.stringify(body)
       : body
   ) as never
@@ -99,7 +107,7 @@ function replaceURLParams<T extends string | URL>(
 
   let urlString = String(url)
   for (const [key, value] of Object.entries(params)) {
-    urlString = urlString.replace(new RegExp(`:${key}($|/)`), `${value}$1`)
+    urlString = urlString.replace(new RegExp(`:${key}($|/)`, 'g'), `${value}$1`)
   }
   return (url instanceof URL ? new URL(urlString) : urlString) as T
 }
@@ -140,7 +148,7 @@ class ParseResponseError extends Error {
     message: string,
     public issues: readonly StandardSchemaV1.Issue[]
   ) {
-    super(JSON.stringify({ message, issues }, null, 2))
+    super(message)
     this.name = 'ParseResponseError'
     this.issues = issues
   }
