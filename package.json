@@ -12,7 +12,13 @@
       "import": "./dist/index.mjs"
     }
   },
-  "keywords": ["fetch", "api", "wrapper", "service", "typescript"],
+  "keywords": [
+    "fetch",
+    "api",
+    "wrapper",
+    "service",
+    "typescript"
+  ],
   "author": "Gustavo Guichard <@gugaguichard>",
   "license": "MIT",
   "engines": {
@@ -26,18 +32,21 @@
     "test": "vitest run"
   },
   "devDependencies": {
-    "@biomejs/biome": "^1.9.4",
+    "@biomejs/biome": "^2.0.0",
     "@standard-schema/spec": "^1.0.0",
-    "@types/node": "^22.1.0",
-    "arktype": "^2.0.4",
-    "jsdom": "^24.1.1",
-    "string-ts": "^2.2.0",
-    "tsup": "^8.2.4",
-    "typescript": "^5.5.4",
+    "@types/node": "^24.0.3",
+    "arktype": "^2.1.20",
+    "jsdom": "^26.1.0",
+    "string-ts": "^2.2.1",
+    "tsup": "^8.5.0",
+    "typescript": "^5.8.3",
     "vitest": "latest",
-    "zod": "4.0.0-beta.20250420T053007"
+    "zod": "3.25.67"
   },
-  "files": ["README.md", "./dist/*"],
+  "files": [
+    "README.md",
+    "./dist/*"
+  ],
   "repository": {
     "type": "git",
     "url": "git+https://github.com/gustavoguichard/make-service.git"

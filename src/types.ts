@@ -52,17 +52,11 @@ type BaseOptions = {
 
 type HTTPMethod = (typeof HTTP_METHODS)[number]
 
-type TypedResponseJson = <
-  Input = unknown,
-  Output = Input
->(
+type TypedResponseJson = <Input = unknown, Output = Input>(
   schema?: StandardSchemaV1<Input, Output>
 ) => Promise<Output>
 
-type TypedResponseText = <
-  Input extends string = string,
-  Output = Input
->(
+type TypedResponseText = <Input extends string = string, Output = Input>(
   schema?: StandardSchemaV1<Input, Output>
 ) => Promise<Output>
 
@@ -80,7 +74,7 @@ type ExtractPathParams<T extends string> =
       >
     : T extends `${infer _}:${infer Param}`
       ? { [K in Param]: string | number }
-      : // biome-ignore lint/complexity/noBannedTypes: <explanation>
+      : // biome-ignore lint/complexity/noBannedTypes: I know what I'm doing
         {}
 
 export type {
