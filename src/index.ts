@@ -4,8 +4,8 @@ export {
   ensureStringBody,
   makeGetApiURL,
   mergeHeaders,
+  ParseResponseError,
   replaceURLParams,
   typeOf,
-  ParseResponseError,
 } from './primitives'
 export type * from './types'
