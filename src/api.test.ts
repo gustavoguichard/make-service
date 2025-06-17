@@ -457,7 +457,7 @@ describe('typedResponse', () => {
       )
       expect(error.issues).toMatchObject([
         {
-          message: 'Invalid input: expected string, received number',
+          message: 'Expected string, received number',
           path: ['foo'],
         },
       ])
