@@ -74,6 +74,12 @@ Or you can use it with Deno:
 import { makeService } from "https://deno.land/x/make_service/mod.ts";
 ```
 
+If you want to use it with a schema parser - such as [zod](https://zod.dev/), [arktype](https://arktype.dev/), [valibot](https://valibot.dev/), or other [standard-schema](https://standardschema.dev) libraries -, you need to install it as a peer dependency:
+
+```sh
+npm install make-service @standard-schema/spec
+```
+
 # API
 
 This library exports the `makeService` function and some primitives used to build it. You can use the primitives as you wish but the `makeService` will have all the features combined.

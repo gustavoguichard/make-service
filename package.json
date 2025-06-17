@@ -43,6 +43,9 @@
     "vitest": "latest",
     "zod": "3.25.67"
   },
+  "peerDependencies": {
+    "@standard-schema/spec": "^1.0.0"
+  },
   "files": [
     "README.md",
     "./dist/*"
