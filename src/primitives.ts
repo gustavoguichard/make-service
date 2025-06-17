@@ -17,9 +17,11 @@ function addQueryToURL<T extends string | URL>(
     return `${url}${separator}${new URLSearchParams(searchParams)}` as T
   }
   if (searchParams && url instanceof URL) {
+    const result = new URL(url.toString())
     for (const [key, value] of new URLSearchParams(searchParams).entries()) {
-      url.searchParams.set(key, value)
+      result.searchParams.set(key, value)
     }
+    return result as T
   }
   return url
 }

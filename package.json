@@ -26,10 +26,7 @@
     "vitest": "latest",
     "zod": "4.0.0-beta.20250420T053007"
   },
-  "files": [
-    "README.md",
-    "./dist/*"
-  ],
+  "files": ["README.md", "./dist/*"],
   "repository": {
     "type": "git",
     "url": "git+https://github.com/gustavoguichard/make-service.git"

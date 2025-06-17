@@ -496,7 +496,7 @@ This little library has plenty of other useful functions that you can use to bui
 ## addQueryToURL
 It receives a URL instance or URL string and an object-like query and returns a new URL with the query appended to it.
 
-It will preserve the original query if it exists and will also preserve the type of the given URL.
+It will preserve the original query if it exists and will also preserve the type of the given URL. When a `URL` object is provided, the original instance is left untouched and a new one is returned.
 
 ```ts
 import { addQueryToURL } from 'make-service'
@@ -510,17 +510,17 @@ addQueryToURL(
 )
 // https://example.com/api/users?role=admin&page=2
 
-addQueryToURL(
-  new URL("https://example.com/api/users"),
-  { page: "2" },
-)
+const url = new URL("https://example.com/api/users")
+addQueryToURL(url, { page: "2" })
 // https://example.com/api/users?page=2
+url.toString()
+// 'https://example.com/api/users'
 
-addQueryToURL(
-  new URL("https://example.com/api/users?role=admin"),
-  { page: "2" },
-)
+const urlWithRole = new URL("https://example.com/api/users?role=admin")
+addQueryToURL(urlWithRole, { page: "2" })
 // https://example.com/api/users?role=admin&page=2
+urlWithRole.toString()
+// 'https://example.com/api/users?role=admin'
 ```
 
 ## ensureStringBody
