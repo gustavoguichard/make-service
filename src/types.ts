@@ -52,13 +52,19 @@ type BaseOptions = {
 
 type HTTPMethod = (typeof HTTP_METHODS)[number]
 
-type TypedResponseJson = <T = unknown>(
-  schema?: StandardSchemaV1<T>
-) => Promise<T>
+type TypedResponseJson = <
+  Input = unknown,
+  Output = Input
+>(
+  schema?: StandardSchemaV1<Input, Output>
+) => Promise<Output>
 
-type TypedResponseText = <T extends string = string>(
-  schema?: StandardSchemaV1<T>
-) => Promise<T>
+type TypedResponseText = <
+  Input extends string = string,
+  Output = Input
+>(
+  schema?: StandardSchemaV1<Input, Output>
+) => Promise<Output>
 
 type GetJson = (response: Response) => TypedResponseJson
 type GetText = (response: Response) => TypedResponseText
