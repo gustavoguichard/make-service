@@ -9,4 +9,19 @@ export {
   typeOf,
 } from './primitives'
 export type { StandardSchema } from './standard-schema'
-export type * from './types'
+export type {
+  BaseOptions,
+  EnhancedRequestInit,
+  GetJson,
+  GetText,
+  HTTPMethod,
+  JSONValue,
+  PathParams,
+  RequestTransformer,
+  ResponseTransformer,
+  SearchParams,
+  ServiceRequestInit,
+  TypedResponse,
+  TypedResponseJson,
+  TypedResponseText,
+} from './types'
