@@ -1,4 +1,4 @@
-import type { StandardSchemaV1 } from '@standard-schema/spec'
+import type { StandardSchema } from './standard-schema'
 import type { JSONValue, PathParams, SearchParams } from './types'
 
 /**
@@ -138,7 +138,7 @@ function typeOf(t: unknown) {
 class ParseResponseError extends Error {
   constructor(
     message: string,
-    public issues: readonly StandardSchemaV1.Issue[]
+    public issues: readonly StandardSchema.Issue[]
   ) {
     super(JSON.stringify({ message, issues }, null, 2))
     this.name = 'ParseResponseError'

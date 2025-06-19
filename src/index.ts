@@ -8,4 +8,5 @@ export {
   replaceURLParams,
   typeOf,
 } from './primitives'
+export type { StandardSchema } from './standard-schema'
 export type * from './types'
