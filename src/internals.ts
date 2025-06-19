@@ -1,5 +1,5 @@
-import type { StandardSchemaV1 } from '@standard-schema/spec'
 import { ParseResponseError } from './primitives'
+import type { StandardSchema } from './standard-schema'
 import type { GetJson, GetText } from './types'
 
 /**
@@ -10,7 +10,7 @@ import type { GetJson, GetText } from './types'
 const getJson: GetJson =
   (response) =>
   async <Input = unknown, Output = Input>(
-    schema?: StandardSchemaV1<Input, Output>
+    schema?: StandardSchema<Input, Output>
   ) => {
     const json = await response.json()
     if (!schema) return json as Output
@@ -31,7 +31,7 @@ const getJson: GetJson =
 const getText: GetText =
   (response) =>
   async <Input extends string = string, Output = Input>(
-    schema?: StandardSchemaV1<Input, Output>
+    schema?: StandardSchema<Input, Output>
   ) => {
     const text = await response.text()
     if (!schema) return text as Output

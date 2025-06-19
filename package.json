@@ -1,6 +1,6 @@
 {
   "name": "make-service",
-  "version": "4.0.2",
+  "version": "4.1.0",
   "description": "Some utilities to extend the 'fetch' API to better interact with external APIs.",
   "main": "./dist/index.js",
   "module": "./dist/index.mjs",
@@ -33,7 +33,6 @@
   },
   "devDependencies": {
     "@biomejs/biome": "^2.0.0",
-    "@standard-schema/spec": "^1.0.0",
     "@types/node": "^24.0.3",
     "arktype": "^2.1.20",
     "jsdom": "^26.1.0",
@@ -43,9 +42,7 @@
     "vitest": "latest",
     "zod": "3.25.67"
   },
-  "peerDependencies": {
-    "@standard-schema/spec": "^1.0.0"
-  },
+  "peerDependencies": {},
   "files": [
     "README.md",
     "./dist/*"

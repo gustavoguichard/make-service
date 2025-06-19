@@ -1,5 +1,5 @@
-import type { StandardSchemaV1 } from '@standard-schema/spec'
 import type { HTTP_METHODS } from './constants'
+import type { StandardSchema } from './standard-schema'
 
 type JSONValue =
   | string
@@ -53,11 +53,11 @@ type BaseOptions = {
 type HTTPMethod = (typeof HTTP_METHODS)[number]
 
 type TypedResponseJson = <Input = unknown, Output = Input>(
-  schema?: StandardSchemaV1<Input, Output>
+  schema?: StandardSchema<Input, Output>
 ) => Promise<Output>
 
 type TypedResponseText = <Input extends string = string, Output = Input>(
-  schema?: StandardSchemaV1<Input, Output>
+  schema?: StandardSchema<Input, Output>
 ) => Promise<Output>
 
 type GetJson = (response: Response) => TypedResponseJson
