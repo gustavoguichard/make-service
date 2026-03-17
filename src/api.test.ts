@@ -452,9 +452,7 @@ describe('typedResponse', () => {
       if (!(error instanceof ParseResponseError)) throw error
 
       expect(error).toBeInstanceOf(ParseResponseError)
-      expect(error.message).toContain(
-        `"message": "Failed to parse response.json"`
-      )
+      expect(error.message).toBe('Failed to parse response.json')
       expect(error.issues).toMatchObject([
         {
           message: 'Expected string, received number',
@@ -494,10 +492,16 @@ describe('typedResponse', () => {
       if (!(error instanceof ParseResponseError)) throw error
 
       expect(error).toBeInstanceOf(ParseResponseError)
-      expect(error.message).toContain(
-        `"message": "Failed to parse response.text"`
-      )
+      expect(error.message).toBe('Failed to parse response.text')
       expect(error.issues.length).toBeGreaterThan(0)
     }
+  })
+
+  it('should allow calling json and text without throwing', async () => {
+    const res = subject.typedResponse(new Response('{"foo":"bar"}'))
+    const json = await res.json<{ foo: string }>()
+    const text = await res.text()
+    expect(json).toEqual({ foo: 'bar' })
+    expect(text).toBe('{"foo":"bar"}')
   })
 })

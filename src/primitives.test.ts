@@ -79,6 +79,14 @@ describe('addQueryToURL', () => {
       new URL('https://example.com/api')
     )
   })
+
+  it('should keep an empty query string', () => {
+    expect(subject.addQueryToURL('https://example.com/api', '')).toBe(
+      'https://example.com/api?'
+    )
+    const url = subject.addQueryToURL(new URL('https://example.com/api'), '')
+    expect(url.toString()).toBe('https://example.com/api?')
+  })
 })
 
 describe('ensureStringBody', () => {
@@ -96,6 +104,11 @@ describe('ensureStringBody', () => {
     expect(subject.ensureStringBody(3)).toBe('3')
     expect(subject.ensureStringBody(true)).toBe('true')
     expect(subject.ensureStringBody({})).toBe('{}')
+  })
+
+  it('should stringify dates', () => {
+    const d = new Date('2020-01-01T00:00:00.000Z')
+    expect(subject.ensureStringBody(d)).toBe(JSON.stringify(d))
   })
 
   it('should not stringify other valid kinds of BodyInit', () => {
@@ -209,6 +222,12 @@ describe('replaceURLParams', () => {
 
   it('should accept numbers as parameters', () => {
     expect(subject.replaceURLParams('/users/:id', { id: 1 })).toBe('/users/1')
+  })
+
+  it('should replace repeated params', () => {
+    expect(subject.replaceURLParams('/users/:id/posts/:id', { id: '3' })).toBe(
+      '/users/3/posts/3'
+    )
   })
 })
 

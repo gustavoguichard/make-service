@@ -44,8 +44,8 @@ function typedResponse(
 
   return new Proxy(response, {
     get(target, prop) {
-      if (prop === 'json') return getJsonFn(target)
-      if (prop === 'text') return getTextFn(target)
+      if (prop === 'json') return getJsonFn(target.clone())
+      if (prop === 'text') return getTextFn(target.clone())
 
       const value = Reflect.get(target, prop)
 
